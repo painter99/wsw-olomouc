@@ -23,10 +23,6 @@ jobs:
       - name: Unit tests
         run: ./gradlew testDebugUnitTest --stacktrace
 
-      - name: Print test report on failure
-        if: failure()
-        run: find app/build/test-results -name "*.xml" -exec cat {} \;
-
       - name: Build debug APK
         run: ./gradlew assembleDebug
 

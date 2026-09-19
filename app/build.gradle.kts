@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "cz.mares.wswolomouc"
+    namespace = "io.github.painter99.wswolomouc"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "cz.mares.wswolomouc"
+        applicationId = "io.github.painter99.wswolomouc"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

@@ -58,4 +58,6 @@ dependencies {
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.0.21")
+    // Real org.json for JVM unit tests (Android runtime provides it at app runtime)
+    testImplementation("org.json:json:20240303")
 }

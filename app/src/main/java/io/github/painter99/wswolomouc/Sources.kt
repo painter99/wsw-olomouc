@@ -1,4 +1,4 @@
-package cz.mares.wswolomouc
+package io.github.painter99.wswolomouc
 
 /**
  * Verified data source endpoints (PRD F1.1, F1.2).

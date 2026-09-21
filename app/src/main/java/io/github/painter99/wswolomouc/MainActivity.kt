@@ -195,7 +195,7 @@ fun StationCard(s: StationUi, nowMs: Long, isPrimary: Boolean) {
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Vítr ${Format.wind(s.windMs)} · Poryvy ${Format.wind(s.gustMs)}",
+                text = "Vítr ${Format.wind(s.windMs)} · Poryvy ${Format.wind(s.windGustMs)}",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(

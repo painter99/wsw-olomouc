@@ -32,6 +32,11 @@ object AppModule {
         .readTimeout(10, TimeUnit.SECONDS)
         .build()
 
+    /** Wall clock in epoch ms — injected so UI code stays testable. */
+    @Provides
+    @Singleton
+    fun systemClock(): () -> Long = System::currentTimeMillis
+
     @Provides
     @Singleton
     fun appDatabase(@ApplicationContext context: Context): AppDatabase =

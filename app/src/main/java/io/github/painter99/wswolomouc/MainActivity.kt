@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -89,7 +90,9 @@ fun MainScreen(viewModel: MainViewModel) {
 
     Surface(
         color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.fillMaxSize()
+        // M1.6a.1: targetSdk 35 draws edge-to-edge — keep content below the
+        // status bar (the status row collided with clock/indicators).
+        modifier = Modifier.fillMaxSize().statusBarsPadding()
     ) {
         MainContent(state = state, nowMs = nowMs, onRefresh = viewModel::refresh)
     }
@@ -111,12 +114,6 @@ fun MainContent(state: MainUiState, nowMs: Long, onRefresh: () -> Unit) {
         StatusRow(state, nowMs)
         state.primary?.let { StationCard(it, nowMs, isPrimary = true) }
         state.secondary?.let { StationCard(it, nowMs, isPrimary = false) }
-        if (state.primary == null && state.secondary == null) {
-            Text(
-                "Offline — zatím žádná data. Zkus aktualizovat později.",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
         TextButton(onClick = onRefresh) { Text("Aktualizovat") }
     }
 }
@@ -145,10 +142,12 @@ fun StatusRow(state: MainUiState, nowMs: Long) {
             modifier = Modifier.padding(start = 8.dp)
         )
         (state.primary ?: state.secondary)?.let {
-            Text(
-                text = " · měření ${RelativeTimeFormatter.format(it.measuredAtMs, nowMs)}",
-                style = MaterialTheme.typography.bodySmall
-            )
+            if (it.measuredAtMs != null) {
+                Text(
+                    text = " · měření ${RelativeTimeFormatter.format(it.measuredAtMs, nowMs)}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
@@ -173,7 +172,14 @@ fun StationCard(s: StationUi, nowMs: Long, isPrimary: Boolean) {
                 Box(
                     Modifier
                         .size(10.dp)
-                        .background(if (s.isStale) Color(0xFFEF6C00) else Color(0xFF2E7D32), CircleShape)
+                        .background(
+                            when {
+                                !s.hasData -> Color(0xFF9E9E9E)   // no data (M1.6a.1)
+                                s.isStale -> Color(0xFFEF6C00)    // stale
+                                else -> Color(0xFF2E7D32)         // fresh
+                            },
+                            CircleShape
+                        )
                 )
             }
 
@@ -189,7 +195,7 @@ fun StationCard(s: StationUi, nowMs: Long, isPrimary: Boolean) {
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Vítr ${Format.wind(s.windKmh)} · Poryvy ${Format.wind(s.gustKmh)}",
+                text = "Vítr ${Format.wind(s.windMs)} · Poryvy ${Format.wind(s.gustMs)}",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
@@ -197,7 +203,9 @@ fun StationCard(s: StationUi, nowMs: Long, isPrimary: Boolean) {
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Měření: ${RelativeTimeFormatter.format(s.measuredAtMs, nowMs)}",
+                text = s.measuredAtMs?.let {
+                    "Měření: ${RelativeTimeFormatter.format(it, nowMs)}"
+                } ?: "Bez dat",
                 style = MaterialTheme.typography.bodySmall
             )
         }

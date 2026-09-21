@@ -82,7 +82,7 @@ class MainUiStateMapperTest {
     fun wind_chain_mapperToFormat_convertsExactlyOnce() {
         val ui = MainUiStateMapper.stationUi(measurement(Sources.STATION_CHMU), now)
         assertEquals("9 km/h", Format.wind(ui.windMs))
-        assertEquals("29 km/h", Format.wind(ui.gustMs))
+        assertEquals("29 km/h", Format.wind(ui.windGustMs))
     }
 
     @Test

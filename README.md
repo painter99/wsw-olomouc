@@ -2,6 +2,12 @@
 
 **Weather Station Widget Olomouc** — an Android app showing the *current weather in Olomouc (Czech Republic) from direct measurements of local weather stations*, not model forecasts.
 
+## Screenshots
+
+| Widget (4×2) | App |
+|---|---|
+| <img src="docs/screenshots/widget-4x2.jpg" width="300"> | <img src="docs/screenshots/app-main.jpg" width="300"> |
+
 ## Data sources
 
 | Source | Type | Update latency | License |

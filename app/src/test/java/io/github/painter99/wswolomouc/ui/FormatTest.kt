@@ -1,0 +1,41 @@
+package io.github.painter99.wswolomouc.ui
+
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+/**
+ * Value formatting tests (M1.5) — Czech decimal comma, "—" for null.
+ */
+class FormatTest {
+
+    @Test
+    fun temperature() {
+        assertEquals("21 °C", Format.temperature(21.4f))
+        assertEquals("—", Format.temperature(null))
+    }
+
+    @Test
+    fun humidity() {
+        assertEquals("55 %", Format.humidity(55))
+        assertEquals("—", Format.humidity(null))
+    }
+
+    @Test
+    fun pressure() {
+        assertEquals("1013 hPa", Format.pressure(1013.4f))
+        assertEquals("—", Format.pressure(null))
+    }
+
+    @Test
+    fun wind_msToKmh() {
+        assertEquals("9 km/h", Format.wind(2.5f))
+        assertEquals("—", Format.wind(null))
+    }
+
+    @Test
+    fun rain_czechDecimalComma() {
+        assertEquals("1,3 mm", Format.rain(1.25f))
+        assertEquals("0,0 mm", Format.rain(0f))
+        assertEquals("—", Format.rain(null))
+    }
+}

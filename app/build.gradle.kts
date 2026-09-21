@@ -63,6 +63,9 @@ dependencies {
     // Glance widget (M1.6a, PRD F2)
     implementation("androidx.glance:glance-appwidget:1.1.1")
 
+    // WorkManager periodic sync (M1.7, PRD G5/F2.3)
+    implementation("androidx.work:work-runtime-ktx:2.10.0")
+
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.0.21")

@@ -21,10 +21,14 @@ jobs:
         run: chmod +x gradlew
 
       - name: Unit tests
-        run: ./gradlew testDebugUnitTest --stacktrace 2>&1 | tee build_output.txt
+        run: |
+          set -o pipefail
+          ./gradlew testDebugUnitTest --stacktrace 2>&1 | tee build_output.txt
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug 2>&1 | tee apk_build_output.txt
+        run: |
+          set -o pipefail
+          ./gradlew assembleDebug --stacktrace 2>&1 | tee apk_build_output.txt
 
       - name: Emit failure details as annotations
         if: failure()

@@ -51,13 +51,20 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.52")
     ksp("com.google.dagger:hilt-android-compiler:2.52")
 
-    // Network
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    // Network — plain OkHttp (M1.4 decision: only 2 simple GETs, Retrofit
+    // codegen unnecessary; approved by Pavel 2026-09-21)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // Room (M1.4)
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.0.21")
     // Real org.json for JVM unit tests (Android runtime provides it at app runtime)
     testImplementation("org.json:json:20240303")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 }

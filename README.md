@@ -17,7 +17,7 @@ Personal-use project, Phase 1 (M1.x milestones). No Google Play release planned 
 
 ## Tech stack
 
-Kotlin, Jetpack Compose, Glance (widget), Retrofit/OkHttp, Room, Hilt, WorkManager.
+Kotlin, Jetpack Compose, Glance (widget), OkHttp, Room, Hilt, WorkManager.
 
 ## Build
 

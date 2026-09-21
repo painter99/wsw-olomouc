@@ -13,6 +13,13 @@ object Sources {
     /** A station measurement older than this is not used for widget synthesis (F2.5). */
     const val STALE_THRESHOLD_MIN = 30L
 
+    /** Station identifiers stored in Room and used in UI badges (PRD data model). */
+    const val STATION_INFOPOCASI = "INFOPOCASI"
+    const val STATION_CHMU = "CHMU_HOLICE"
+
+    /** Rate limiting: max 1 request per source per 10 min (F1.5). */
+    const val FETCH_RATE_LIMIT_MS = 10L * 60 * 1000
+
     /** Daily CHMU data file URL for the given date (yyyyMMdd). */
     fun chmuDailyUrl(dateCompact: String): String =
         CHMU_BASE + "10m-" + CHMU_STATION_CODE + "-" + dateCompact + ".json"

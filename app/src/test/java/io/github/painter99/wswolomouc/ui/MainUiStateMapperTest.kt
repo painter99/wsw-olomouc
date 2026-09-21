@@ -10,7 +10,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * UI state mapping tests (M1.5, PRD F3.1/F3.2) — pure JVM.
+ * UI state mapping tests (M1.5 + M1.6a.1 hotfix, PRD F3.1/F3.2) — pure JVM.
+ *
+ * M1.6a.1 additions:
+ *  - wind display contract pinned end-to-end (mapper -> Format) after the
+ *    double x3.6 conversion bug seen on device (80 km/h shown for 6.2 m/s);
+ *  - a station without data renders as a placeholder card ("bez dat"),
+ *    it no longer disappears silently (US-002, G3 transparency).
  */
 class MainUiStateMapperTest {
 
@@ -44,6 +50,7 @@ class MainUiStateMapperTest {
         assertEquals(55, ui.humidityPct)
         assertEquals(1013f, ui.pressureHpa)
         assertFalse(ui.isStale)
+        assertTrue(ui.hasData)
     }
 
     @Test
@@ -65,11 +72,17 @@ class MainUiStateMapperTest {
         )
     }
 
+    /**
+     * Prove-It chain test (M1.6a.1): the value that reaches Format.wind must
+     * be m/s — exactly one x3.6 conversion end-to-end. 2.5 m/s -> "9 km/h",
+     * 8 m/s -> "29 km/h". (On device the card showed 80/184 km/h for a
+     * 6.2/14.2 m/s day because Format.wind received already-converted km/h.)
+     */
     @Test
-    fun stationUi_windConvertedToKmh() {
+    fun wind_chain_mapperToFormat_convertsExactlyOnce() {
         val ui = MainUiStateMapper.stationUi(measurement(Sources.STATION_CHMU), now)
-        assertEquals(9.0f, ui.windKmh)   // 2.5 m/s * 3.6
-        assertEquals(28.8f, ui.gustKmh)  // 8 m/s * 3.6
+        assertEquals("9 km/h", Format.wind(ui.windMs))
+        assertEquals("29 km/h", Format.wind(ui.windGustMs))
     }
 
     @Test
@@ -100,15 +113,44 @@ class MainUiStateMapperTest {
         assertEquals(Sources.STATION_CHMU, state.secondary?.station)
     }
 
+    /**
+     * M1.6a.1: a missing station is a placeholder card, not a silent gap —
+     * the user must see WHICH station has no data (G3, US-002).
+     */
     @Test
-    fun fromSnapshot_offlineEmpty_hasNoStations() {
+    fun fromSnapshot_missingStation_isPlaceholderWithoutData() {
+        val snapshot = WeatherRepository.Snapshot(
+            freshness = WeatherRepository.Freshness.OFFLINE,
+            measurements = mapOf(
+                Sources.STATION_CHMU to measurement(Sources.STATION_CHMU, now - 2 * minute)
+            )
+        )
+        val state = MainUiStateMapper.from(snapshot, now)
+
+        val infopocasi = state.primary
+        assertEquals(Sources.STATION_INFOPOCASI, infopocasi?.station)
+        assertEquals("Infopocasi Olomouc", infopocasi?.displayName)
+        assertEquals(false, infopocasi?.hasData)
+        assertNull(infopocasi?.measuredAtMs)
+        assertNull(infopocasi?.temperatureC)
+        assertNull(infopocasi?.windMs)
+        assertEquals(false, infopocasi?.isStale)
+
+        val chmu = state.secondary
+        assertEquals(Sources.STATION_CHMU, chmu?.station)
+        assertEquals(true, chmu?.hasData)
+        assertEquals(now - 2 * minute, chmu?.measuredAtMs)
+    }
+
+    @Test
+    fun fromSnapshot_offlineEmpty_bothPlaceholders() {
         val snapshot = WeatherRepository.Snapshot(
             freshness = WeatherRepository.Freshness.OFFLINE,
             measurements = emptyMap()
         )
         val state = MainUiStateMapper.from(snapshot, now)
-        assertNull(state.primary)
-        assertNull(state.secondary)
+        assertEquals(false, state.primary?.hasData)
+        assertEquals(false, state.secondary?.hasData)
         assertEquals(WeatherRepository.Freshness.OFFLINE, state.freshness)
     }
 }

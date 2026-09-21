@@ -112,11 +112,13 @@ class MainViewModelTest {
     }
 
     @Test
-    fun sourcesFail_noCache_offlineWithNoStations() = runTest {
+    fun sourcesFail_noCache_bothStationsArePlaceholders() = runTest {
         val state = awaitLoaded(viewModel())
         assertEquals(WeatherRepository.Freshness.OFFLINE, state.freshness)
-        assertNull(state.primary)
-        assertNull(state.secondary)
+        // M1.6a.1: a station without data is a placeholder card, not null.
+        assertEquals(false, state.primary?.hasData)
+        assertNull(state.primary?.measuredAtMs)
+        assertEquals(false, state.secondary?.hasData)
     }
 
     @Test
@@ -127,6 +129,9 @@ class MainViewModelTest {
 
         assertEquals(WeatherRepository.Freshness.OFFLINE, state.freshness)
         assertEquals(Sources.STATION_INFOPOCASI, state.primary?.station)
-        assertNull(state.secondary)
+        assertEquals(true, state.primary?.hasData)
+        // M1.6a.1: CHMU has no data -> placeholder, not null.
+        assertEquals(Sources.STATION_CHMU, state.secondary?.station)
+        assertEquals(false, state.secondary?.hasData)
     }
 }

@@ -9,7 +9,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.painter99.wswolomouc.data.ChmuDataSource
 import io.github.painter99.wswolomouc.data.InfopocasiDataSource
-import io.github.painter99.wswolomouc.data.StationDataSource
 import io.github.painter99.wswolomouc.data.WeatherRepository
 import io.github.painter99.wswolomouc.db.AppDatabase
 import io.github.painter99.wswolomouc.db.MeasurementDao
@@ -46,21 +45,19 @@ object AppModule {
     fun measurementDao(db: AppDatabase): MeasurementDao = db.measurementDao()
 
     /**
-     * Source order matters: the first entry is the primary station (F1.4).
-     * Primary = INFOPOCASI, hardcoded per the M1.4 decision (Q5
-     * recommendation; user choice arrives with F5.1).
+     * Primary source first (F1.4). Primary = INFOPOCASI, hardcoded per the
+     * M1.4 decision (Q5 recommendation; user choice arrives with F5.1).
+     * The list is built inline — injecting Kotlin List<T> into Dagger is
+     * type-invariant and fails with Dagger/MissingBinding.
      */
     @Provides
     @Singleton
-    fun stationSources(client: OkHttpClient): List<StationDataSource> = listOf(
-        InfopocasiDataSource(client),
-        ChmuDataSource(client)
-    )
-
-    @Provides
-    @Singleton
-    fun weatherRepository(
-        sources: List<StationDataSource>,
-        dao: MeasurementDao
-    ): WeatherRepository = WeatherRepository(sources, dao)
+    fun weatherRepository(client: OkHttpClient, dao: MeasurementDao): WeatherRepository =
+        WeatherRepository(
+            sources = listOf(
+                InfopocasiDataSource(client),
+                ChmuDataSource(client)
+            ),
+            dao = dao
+        )
 }

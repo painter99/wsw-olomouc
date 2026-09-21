@@ -30,9 +30,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.appwidget.updateAll
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.painter99.wswolomouc.data.WeatherRepository
 import io.github.painter99.wswolomouc.ui.Format
@@ -40,6 +42,7 @@ import io.github.painter99.wswolomouc.ui.MainUiState
 import io.github.painter99.wswolomouc.ui.MainViewModel
 import io.github.painter99.wswolomouc.ui.RelativeTimeFormatter
 import io.github.painter99.wswolomouc.ui.StationUi
+import io.github.painter99.wswolomouc.widget.WswWidget
 import kotlinx.coroutines.delay
 
 /**
@@ -65,6 +68,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
     val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     var nowMs by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
     // Re-render every 60 s so "před X min" stays truthful (PRD G2).
@@ -72,6 +76,14 @@ fun MainScreen(viewModel: MainViewModel) {
         while (true) {
             delay(60_000)
             nowMs = System.currentTimeMillis()
+        }
+    }
+
+    // Push fresh data to the home-screen widget after every completed
+    // refresh (M1.6a: the widget itself is cache-first, no network).
+    LaunchedEffect(state.isLoading) {
+        if (!state.isLoading) {
+            WswWidget().updateAll(context)
         }
     }
 

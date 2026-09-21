@@ -25,7 +25,7 @@ def main():
     if os.path.exists(build_output):
         for line in open(build_output, errors="replace"):
             line = line.rstrip()
-            if line.startswith("e: ") or line.startswith("error: ") or line.startswith(
+            if line.startswith("e: ") or ": error: " in line or line.startswith(
                 "FAILURE: ") or line.startswith("* What went wrong:") or line.startswith(
                 "Caused by:") or line.startswith("A problem was") or (
                 line.startswith("> Task ") and "FAILED" in line) or (

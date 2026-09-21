@@ -1,4 +1,4 @@
-# CI run 34 — commit 8d499bc — m16a1-hotfix-ui
+# CI run 35 — commit b756617 — m16a1-hotfix-ui
 
 ===== build_output.txt =====
 Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
@@ -34,14 +34,23 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:javaPreCompileDebug
 > Task :app:processDebugResources
 > Task :app:kspDebugKotlin
+> Task :app:compileDebugKotlin
+> Task :app:compileDebugJavaWithJavac
+> Task :app:hiltAggregateDepsDebug
+> Task :app:hiltJavaCompileDebug
+> Task :app:processDebugJavaRes
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:transformDebugClassesWithAsm
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:kspDebugUnitTestKotlin
 
-> Task :app:compileDebugKotlin FAILED
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:198:80 Unresolved reference 'gustMs'.
+> Task :app:compileDebugUnitTestKotlin FAILED
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainUiStateMapperTest.kt:85:48 Unresolved reference 'gustMs'.
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':app:compileDebugKotlin'.
+Execution failed for task ':app:compileDebugUnitTestKotlin'.
 > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
    > Compilation error. See log for more details
 
@@ -51,7 +60,7 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Get more help at https://help.gradle.org.
 
 * Exception is:
-org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileDebugKotlin'.
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileDebugUnitTestKotlin'.
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
 	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
@@ -240,6 +249,6 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 1m 14s
-17 actionable tasks: 17 executed
+BUILD FAILED in 1m 51s
+26 actionable tasks: 26 executed
 

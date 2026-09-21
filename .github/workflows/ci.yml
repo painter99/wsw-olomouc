@@ -21,7 +21,11 @@ jobs:
         run: chmod +x gradlew
 
       - name: Unit tests
-        run: ./gradlew testDebugUnitTest --stacktrace
+        run: ./gradlew testDebugUnitTest --stacktrace 2>&1 | tee build_output.txt
+
+      - name: Emit failure details as annotations
+        if: failure()
+        run: python3 .github/ci_failure_report.py build_output.txt app/build/test-results/testDebugUnitTest
 
       - name: Build debug APK
         run: ./gradlew assembleDebug

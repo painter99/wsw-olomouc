@@ -1,6 +1,7 @@
 package io.github.painter99.wswolomouc
 
 import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors

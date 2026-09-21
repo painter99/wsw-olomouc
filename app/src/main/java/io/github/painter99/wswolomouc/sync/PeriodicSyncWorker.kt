@@ -3,6 +3,7 @@ package io.github.painter99.wswolomouc.sync
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.glance.appwidget.updateAll
 import dagger.hilt.android.EntryPointAccessors
 import io.github.painter99.wswolomouc.data.WeatherRepository
 import io.github.painter99.wswolomouc.widget.WswWidget

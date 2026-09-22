@@ -16,6 +16,7 @@ import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestWatcher
@@ -133,5 +134,34 @@ class MainViewModelTest {
         // M1.6a.1: CHMU has no data -> placeholder, not null.
         assertEquals(Sources.STATION_CHMU, state.secondary?.station)
         assertEquals(false, state.secondary?.hasData)
+    }
+
+    // --- M1.6b-3: refresh feedback -------------------------------------------
+
+    @Test
+    fun refresh_completes_isRefreshingFalse() = runTest {
+        val vm = viewModel(
+            primary = measurement(Sources.STATION_INFOPOCASI),
+            secondary = measurement(Sources.STATION_CHMU)
+        )
+        val state = awaitLoaded(vm)
+
+        assertFalse(state.isRefreshing)
+        assertNull(state.rateLimitMessage)
+    }
+
+    @Test
+    fun refresh_withinRateLimit_showsRateLimitMessage() = runTest {
+        val vm = viewModel(
+            primary = measurement(Sources.STATION_INFOPOCASI),
+            secondary = measurement(Sources.STATION_CHMU)
+        )
+        awaitLoaded(vm)
+
+        vm.refresh()   // fixed clock -> every source is rate limited
+        val state = awaitLoaded(vm)
+
+        assertTrue("was ${state.rateLimitMessage}", state.rateLimitMessage != null)
+        assertTrue("was ${state.rateLimitMessage}", state.rateLimitMessage!!.contains("min"))
     }
 }

@@ -1,6 +1,7 @@
 package io.github.painter99.wswolomouc.ui
 
 import io.github.painter99.wswolomouc.Sources
+import io.github.painter99.wswolomouc.data.FetchResult
 import io.github.painter99.wswolomouc.data.StationMeasurement
 import io.github.painter99.wswolomouc.data.WeatherRepository
 import org.junit.Assert.assertEquals
@@ -166,5 +167,58 @@ class MainUiStateMapperTest {
         assertEquals(false, state.primary?.hasData)
         assertEquals(false, state.secondary?.hasData)
         assertEquals(WeatherRepository.Freshness.OFFLINE, state.freshness)
+    }
+
+    // --- M1.6b-3: per-source status labels -----------------------------------
+
+    @Test
+    fun fromSnapshot_mapsPerSourceStatusLabels() {
+        val snapshot = WeatherRepository.Snapshot(
+            freshness = WeatherRepository.Freshness.STALE,
+            measurements = mapOf(Sources.STATION_INFOPOCASI to measurement(Sources.STATION_INFOPOCASI)),
+            sourceResults = mapOf(
+                Sources.STATION_INFOPOCASI to
+                    FetchResult.Success(measurement(Sources.STATION_INFOPOCASI)),
+                Sources.STATION_CHMU to FetchResult.HttpError(404)
+            )
+        )
+
+        val state = MainUiStateMapper.from(snapshot, now)
+
+        assertEquals("OK", state.sourceStatus[Sources.STATION_INFOPOCASI])
+        assertEquals("HTTP 404", state.sourceStatus[Sources.STATION_CHMU])
+    }
+
+    @Test
+    fun fromSnapshot_networkAndParseErrors_getHumanLabels() {
+        val snapshot = WeatherRepository.Snapshot(
+            freshness = WeatherRepository.Freshness.OFFLINE,
+            measurements = emptyMap(),
+            sourceResults = mapOf(
+                Sources.STATION_INFOPOCASI to FetchResult.NetworkError("timeout"),
+                Sources.STATION_CHMU to FetchResult.ParseError("bad json")
+            )
+        )
+
+        val state = MainUiStateMapper.from(snapshot, now)
+
+        assertEquals("síť", state.sourceStatus[Sources.STATION_INFOPOCASI])
+        assertEquals("data", state.sourceStatus[Sources.STATION_CHMU])
+    }
+
+    @Test
+    fun fromSnapshot_placeholderCarriesSourceStatusNote() {
+        val snapshot = WeatherRepository.Snapshot(
+            freshness = WeatherRepository.Freshness.OFFLINE,
+            measurements = emptyMap(),
+            sourceResults = mapOf(
+                Sources.STATION_CHMU to FetchResult.HttpError(404)
+            )
+        )
+
+        val state = MainUiStateMapper.from(snapshot, now)
+
+        assertEquals("HTTP 404", state.secondary?.statusNote)
+        assertNull(state.primary?.statusNote)
     }
 }

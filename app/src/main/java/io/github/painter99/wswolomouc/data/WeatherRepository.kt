@@ -67,9 +67,15 @@ class WeatherRepository(
         /**
          * Per-source outcome of the LAST refresh attempt (M1.6b-3).
          * Sources skipped by the rate limit keep their previous entry.
-         * Empty until the repository starts recording outcomes.
          */
-        val sourceResults: Map<String, FetchResult> = emptyMap()
+        val sourceResults: Map<String, FetchResult> = emptyMap(),
+        /**
+         * Earliest time the next refresh attempt is allowed (M1.6b-3,
+         * F1.5) — max lastAttempt + rate limit; null = nothing attempted yet.
+         */
+        val nextRefreshAllowedAtMs: Long? = null,
+        /** True when THIS refresh skipped every source due to the rate limit. */
+        val skippedByRateLimit: Boolean = false
     )
 
     private val lastAttemptAt = mutableMapOf<String, Long>()

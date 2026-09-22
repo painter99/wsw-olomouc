@@ -39,7 +39,9 @@ data class StationUi(
     val measuredAtMs: Long?,
     val isStale: Boolean,
     /** false = placeholder card ("bez dat"), true = real measurement. */
-    val hasData: Boolean
+    val hasData: Boolean,
+    /** Per-source fetch outcome note (M1.6b-3), e.g. "HTTP 404"; null = OK/no attempt. */
+    val statusNote: String? = null
 ) {
     companion object {
         fun displayNameFor(station: String): String = when (station) {
@@ -64,7 +66,17 @@ data class MainUiState(
     val isLoading: Boolean = true,
     val freshness: WeatherRepository.Freshness? = null,
     val primary: StationUi? = null,
-    val secondary: StationUi? = null
+    val secondary: StationUi? = null,
+    /**
+     * Per-source fetch outcome label (M1.6b-3): station id -> "OK" /
+     * "HTTP 404" / "síť" / "data". Shown in the status row so a failing
+     * source is visible instead of a global "Offline" guess.
+     */
+    val sourceStatus: Map<String, String> = emptyMap(),
+    /** True while a refresh is running (M1.6b-3 refresh feedback). */
+    val isRefreshing: Boolean = false,
+    /** Non-null = refresh was skipped by the rate limit; text says when to retry. */
+    val rateLimitMessage: String? = null
 )
 
 object MainUiStateMapper {

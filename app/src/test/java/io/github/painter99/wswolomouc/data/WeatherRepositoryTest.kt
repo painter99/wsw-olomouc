@@ -243,4 +243,26 @@ class WeatherRepositoryTest {
             second.sourceResults["B"] is FetchResult.NetworkError
         )
     }
+
+    @Test
+    fun refresh_setsNextRefreshAllowedAt() = runTest {
+        val ok = FakeSource("A", measurement("A", now), FetchResult.Success(measurement("A", now)))
+        val repo = WeatherRepository(listOf(ok), FakeDao(), clock = { now })
+
+        val snap = repo.refresh()
+
+        assertEquals(now + Sources.FETCH_RATE_LIMIT_MS, snap.nextRefreshAllowedAtMs)
+    }
+
+    @Test
+    fun refresh_allSourcesRateLimited_reportsSkip() = runTest {
+        val ok = FakeSource("A", measurement("A", now), FetchResult.Success(measurement("A", now)))
+        val repo = WeatherRepository(listOf(ok), FakeDao(), clock = { now })
+
+        repo.refresh()
+        val second = repo.refresh()   // rate limited -> nothing attempted
+
+        assertTrue(second.skippedByRateLimit)
+        assertEquals(now + Sources.FETCH_RATE_LIMIT_MS, second.nextRefreshAllowedAtMs)
+    }
 }

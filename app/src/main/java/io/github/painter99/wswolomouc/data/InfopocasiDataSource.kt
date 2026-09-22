@@ -22,21 +22,29 @@ class InfopocasiDataSource(
 
     override val id: String = Sources.STATION_INFOPOCASI
 
-    override suspend fun fetch(): StationMeasurement? = withContext(Dispatchers.IO) {
+    override suspend fun fetch(): StationMeasurement? =
+        (fetchResult() as? FetchResult.Success)?.measurement
+
+    override suspend fun fetchResult(): FetchResult = withContext(Dispatchers.IO) {
         try {
             val request = Request.Builder()
                 .url(url)
                 .header("User-Agent", "WSW-Olomouc/0.1 (personal; +https://github.com/painter99/wsw-olomouc)")
                 .build()
             client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) return@withContext null
-                val body = response.body?.string() ?: return@withContext null
-                CustomClientrawParser.parse(body)?.let {
-                    StationMeasurementMapper.fromCustomClientraw(it, fetchedAtMs = clock())
-                }
+                if (!response.isSuccessful) return@withContext FetchResult.HttpError(response.code)
+                val body = response.body?.string()
+                    ?: return@withContext FetchResult.NetworkError("empty response body")
+                val parsed = CustomClientrawParser.parse(body)
+                    ?: return@withContext FetchResult.ParseError(
+                        "customclientraw payload unusable"
+                    )
+                FetchResult.Success(
+                    StationMeasurementMapper.fromCustomClientraw(parsed, fetchedAtMs = clock())
+                )
             }
         } catch (e: Exception) {
-            null
+            FetchResult.NetworkError(e.message ?: e.javaClass.simpleName)
         }
     }
 }

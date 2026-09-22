@@ -24,19 +24,27 @@ class ChmuDataSource(
 
     override val id: String = Sources.STATION_CHMU
 
-    override suspend fun fetch(): StationMeasurement? = withContext(Dispatchers.IO) {
+    override suspend fun fetch(): StationMeasurement? =
+        (fetchResult() as? FetchResult.Success)?.measurement
+
+    override suspend fun fetchResult(): FetchResult = withContext(Dispatchers.IO) {
         try {
             val dateCompact = LocalDate.now(zone).format(DateTimeFormatter.BASIC_ISO_DATE)
             val request = Request.Builder().url(urlForDate(dateCompact)).build()
             client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) return@withContext null
-                val body = response.body?.string() ?: return@withContext null
-                ChmuJsonParser.parse(body, Sources.CHMU_STATION_CODE)?.let {
-                    StationMeasurementMapper.fromChmu(it, fetchedAtMs = clock())
-                }
+                if (!response.isSuccessful) return@withContext FetchResult.HttpError(response.code)
+                val body = response.body?.string()
+                    ?: return@withContext FetchResult.NetworkError("empty response body")
+                val parsed = ChmuJsonParser.parse(body, Sources.CHMU_STATION_CODE)
+                    ?: return@withContext FetchResult.ParseError(
+                        "no usable rows in daily 10M JSON"
+                    )
+                FetchResult.Success(
+                    StationMeasurementMapper.fromChmu(parsed, fetchedAtMs = clock())
+                )
             }
         } catch (e: Exception) {
-            null
+            FetchResult.NetworkError(e.message ?: e.javaClass.simpleName)
         }
     }
 }

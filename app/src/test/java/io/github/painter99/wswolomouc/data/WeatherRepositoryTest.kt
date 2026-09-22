@@ -43,10 +43,12 @@ class WeatherRepositoryTest {
             fetchCount++
             return result
         }
-        override suspend fun fetchResult(): FetchResult =
-            detailedResult
-                ?: fetch()?.let { FetchResult.Success(it) }
+        override suspend fun fetchResult(): FetchResult {
+            fetchCount++
+            return detailedResult
+                ?: result?.let { FetchResult.Success(it) }
                 ?: FetchResult.ParseError("fake default")
+        }
     }
 
     private fun measurement(

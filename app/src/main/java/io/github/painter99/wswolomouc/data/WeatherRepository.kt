@@ -86,11 +86,13 @@ class WeatherRepository(
     suspend fun refresh(): Snapshot = withContext(Dispatchers.IO) {
         val now = clock()
         val fetched = mutableMapOf<String, StationMeasurement>()
+        var attemptedAny = false
 
         for (source in sources) {
             val last = lastAttemptAt[source.id]
             if (last != null && now - last < rateLimitMs) continue // F1.5
             lastAttemptAt[source.id] = now
+            attemptedAny = true
             val outcome = try {
                 source.fetchResult()
             } catch (e: Exception) {
@@ -111,7 +113,13 @@ class WeatherRepository(
             merged.values.all { isFresh(it, now) } -> Freshness.FRESH
             else -> Freshness.STALE
         }
-        Snapshot(freshness, merged, lastOutcome.toMap())
+        Snapshot(
+            freshness = freshness,
+            measurements = merged,
+            sourceResults = lastOutcome.toMap(),
+            nextRefreshAllowedAtMs = lastAttemptAt.values.maxOrNull()?.plus(rateLimitMs),
+            skippedByRateLimit = !attemptedAny && lastAttemptAt.isNotEmpty()
+        )
     }
 
     /** Latest persisted value per station (cache-first reads, NF3). */

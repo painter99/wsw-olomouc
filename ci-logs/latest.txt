@@ -1,4 +1,4 @@
-# CI run 48 — commit e39d795 — m16b2-widget-layout
+# CI run 49 — commit 9878761 — m16b2-widget-layout
 
 ===== build_output.txt =====
 Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
@@ -29,140 +29,24 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
-> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebugUnitTest
+> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebug
 > Task :app:processDebugResources
 > Task :app:kspDebugKotlin
+
 > Task :app:compileDebugKotlin
-> Task :app:compileDebugJavaWithJavac
-> Task :app:hiltAggregateDepsDebug
-> Task :app:hiltJavaCompileDebug
-> Task :app:processDebugJavaRes
-> Task :app:bundleDebugClassesToCompileJar
-> Task :app:transformDebugClassesWithAsm
-> Task :app:bundleDebugClassesToRuntimeJar
-> Task :app:kspDebugUnitTestKotlin
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/CustomClientrawParser.kt:78:37 None of the following candidates is applicable:
+static fun of(p0: Int, p1: Month!, p2: Int, p3: Int, p4: Int, p5: Int): LocalDateTime!
+static fun of(p0: Int, p1: Int, p2: Int, p3: Int, p4: Int, p5: Int): LocalDateTime!
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/CustomClientrawParser.kt:80:15 Unresolved reference 'toInstant'.
 
-> Task :app:compileDebugUnitTestKotlin
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:29:17 Unresolved reference 'CustomClientrawParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:32:33 Unresolved reference 'temperatureC'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:33:28 Unresolved reference 'humidityPct'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:34:33 Unresolved reference 'pressureHpa'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:35:31 Unresolved reference 'windSpeedKmh'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:36:31 Unresolved reference 'windGustKmh'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:37:29 Unresolved reference 'windDirDeg'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:38:30 Unresolved reference 'rainTodayMm'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:43:17 Unresolved reference 'CustomClientrawParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:47:15 Unresolved reference 'measuredAtEpochMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:54:20 Unresolved reference 'CustomClientrawParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:60:20 Unresolved reference 'CustomClientrawParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:66:20 Unresolved reference 'CustomClientrawParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:71:20 Unresolved reference 'CustomClientrawParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:72:20 Unresolved reference 'CustomClientrawParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:73:20 Unresolved reference 'CustomClientrawParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:80:17 Unresolved reference 'CustomClientrawParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:82:33 Unresolved reference 'temperatureC'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:83:22 Unresolved reference 'humidityPct'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:84:22 Unresolved reference 'pressureHpa'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:85:22 Unresolved reference 'windSpeedKmh'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:86:22 Unresolved reference 'windGustKmh'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:87:22 Unresolved reference 'windDirDeg'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:88:22 Unresolved reference 'rainTodayMm'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/CustomClientrawParserTest.kt:89:22 Unresolved reference 'measuredAtEpochMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:25:42 Unresolved reference 'fromCustomClientraw'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:26:52 Unresolved reference 'station'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:27:31 Unresolved reference 'temperatureC'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:28:28 Unresolved reference 'humidityPct'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:29:33 Unresolved reference 'pressureHpa'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:30:30 Unresolved reference 'rainMm'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:36:42 Unresolved reference 'fromCustomClientraw'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:37:38 Unresolved reference 'windMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:38:38 Unresolved reference 'windGustMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:44:42 Unresolved reference 'fromCustomClientraw'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:45:44 Unresolved reference 'measuredAtMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:51:42 Unresolved reference 'fromCustomClientraw'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:52:35 Unresolved reference 'measuredAtMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:61:42 Unresolved reference 'fromCustomClientraw'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:62:22 Unresolved reference 'temperatureC'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:63:22 Unresolved reference 'humidityPct'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:64:22 Unresolved reference 'pressureHpa'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:65:22 Unresolved reference 'windMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:66:22 Unresolved reference 'windGustMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:67:22 Unresolved reference 'windDirDeg'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:68:22 Unresolved reference 'rainMm'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/data/StationMeasurementMapperTest.kt:113:9 Unresolved reference 'CustomClientrawMeasurement'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/FormatTest.kt:20:40 Unresolved reference 'temperaturePrecise'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/FormatTest.kt:21:39 Unresolved reference 'temperaturePrecise'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/FormatTest.kt:22:40 Unresolved reference 'temperaturePrecise'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/FormatTest.kt:23:34 Unresolved reference 'temperaturePrecise'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:90:27 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:91:36 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:91:38 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:91:50 Unresolved reference 'name'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:92:29 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:92:31 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:92:43 Unresolved reference 'temperatureC'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:93:20 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:93:22 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:93:34 Unresolved reference 'hasData'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:94:21 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:94:23 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:94:35 Unresolved reference 'isStale'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:95:40 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:95:42 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:95:54 Unresolved reference 'measuredAtMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:96:37 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:96:39 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:96:51 Unresolved reference 'name'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:97:29 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:97:31 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:97:43 Unresolved reference 'temperatureC'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:98:20 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:98:22 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:98:34 Unresolved reference 'hasData'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:99:20 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:99:22 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:99:34 Unresolved reference 'isStale'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:100:41 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:100:43 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:100:55 Unresolved reference 'measuredAtMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:142:20 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:142:22 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:142:34 Unresolved reference 'isStale'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:143:21 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:143:23 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:143:35 Unresolved reference 'isStale'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:152:21 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:152:23 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:152:35 Unresolved reference 'hasData'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:153:37 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:153:39 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:153:51 Unresolved reference 'name'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:154:20 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:154:22 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:154:34 Unresolved reference 'temperatureC'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:155:20 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:155:22 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:155:34 Unresolved reference 'measuredAtMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:156:21 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:156:23 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:156:35 Unresolved reference 'isStale'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:165:21 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:165:23 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:165:35 Unresolved reference 'hasData'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:166:21 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:166:23 Unresolved reference 'stations'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:166:35 Unresolved reference 'hasData'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:187:59 Unresolved reference 'showStationHumidity'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/widget/WidgetLayoutTest.kt:188:57 Unresolved reference 'showStationHumidity'.
-
-> Task :app:compileDebugUnitTestKotlin FAILED
+> Task :app:compileDebugKotlin FAILED
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':app:compileDebugUnitTestKotlin'.
+Execution failed for task ':app:compileDebugKotlin'.
 > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
    > Compilation error. See log for more details
 
@@ -172,7 +56,7 @@ Execution failed for task ':app:compileDebugUnitTestKotlin'.
 > Get more help at https://help.gradle.org.
 
 * Exception is:
-org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileDebugUnitTestKotlin'.
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileDebugKotlin'.
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
 	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
@@ -361,6 +245,6 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 2m 6s
-26 actionable tasks: 26 executed
+BUILD FAILED in 1m 40s
+17 actionable tasks: 17 executed
 

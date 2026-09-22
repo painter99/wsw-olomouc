@@ -16,8 +16,8 @@ import org.junit.Test
  *
  * Domain (PRD F3.6): applies Wind Chill for T <= 10 °C and v > 4.8 km/h,
  * Heat Index for T >= 27 °C (regression >= 80 °F), otherwise feels-like = T.
- * Outside the HI temperature domain the result must equal T even for high RH
- * (the Rothfusz regression is only meaningful in the NWS chart domain).
+ * Boundary values verified by exact formula computation (see KDoc in
+ * FeelsLike.kt); deltas cover Float precision and chart rounding.
  */
 class FeelsLikeTest {
 
@@ -43,7 +43,7 @@ class FeelsLikeTest {
     fun windChill_boundaryTenDegrees() {
         // T <= 10 °C applies; above 10 °C it must not
         val at10 = FeelsLike.calculate(10f, windKmh = 20f, humidityPct = null)!!
-        assertEquals(9.8f, at10, 0.05f)
+        assertEquals(7.4f, at10, 0.05f)
         assertEquals(15f, FeelsLike.calculate(15f, windKmh = 20f, humidityPct = null))
     }
 
@@ -59,8 +59,9 @@ class FeelsLikeTest {
 
     @Test
     fun heatIndex_belowRegressionThreshold_returnsTemperature() {
-        // Regression result < 80 °F -> HI = T (NWS rule), even at high humidity
-        assertEquals(27f, FeelsLike.calculate(27f, windKmh = 5f, humidityPct = 70))
+        // Regression result < 80 °F -> HI = T (NWS rule): 27 °C / 30 % -> 79.6 °F
+        assertEquals(27f, FeelsLike.calculate(27f, windKmh = 5f, humidityPct = 30))
+        // Below the 27 °C domain: HI = T even at high humidity
         assertEquals(26f, FeelsLike.calculate(26f, windKmh = 5f, humidityPct = 90))
     }
 
@@ -68,6 +69,8 @@ class FeelsLikeTest {
     fun heatIndex_moderateTemperatureHighHumidity() {
         // 29 °C (84.2 °F) / 70 % -> ~32.7 °C (90.9 °F)
         assertEquals(32.7f, FeelsLike.calculate(temperatureC = 29f, windKmh = 5f, humidityPct = 70)!!, 0.3f)
+        // 27 °C (80.6 °F) / 70 % -> ~28.9 °C (regression 82.4 °F, above the 80 °F threshold)
+        assertEquals(28.9f, FeelsLike.calculate(temperatureC = 27f, windKmh = 5f, humidityPct = 70)!!, 0.2f)
     }
 
     // ---- Neutral zone / nulls ----

@@ -4,74 +4,61 @@ import io.github.painter99.wswolomouc.Sources
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import java.time.LocalDateTime
-import java.time.ZoneId
 
 /**
  * Tests for mapping source-specific measurements into the unified
- * [StationMeasurement] (M1.4).
+ * [StationMeasurement] (M1.4, customclientraw switch M1.6b-2).
  *
- * PRD data model: wind is stored in m/s (clientraw provides km/h -> /3.6,
- * CHMU provides m/s directly). Pressure exists only for infopocasi (CHMU 10M
- * feed has no P element — verified M1.3).
+ * PRD data model: wind is stored in m/s (infopocasi customclientraw provides
+ * km/h -> /3.6, CHMU provides m/s directly). Pressure exists only for
+ * infopocasi (CHMU 10M feed has no P element — verified M1.3).
  */
 class StationMeasurementMapperTest {
 
     private val fetchedAt = 1_758_000_000_000L
 
-    // --- clientraw mapping -------------------------------------------------
+    // --- customclientraw mapping -------------------------------------------
 
     @Test
-    fun clientraw_mapsTemperatureHumidityPressure() {
-        val m = ClientrawMeasurement(
-            temperatureC = 18.4f, humidityPct = 62, pressureHpa = 1013.2f,
-            windSpeedKmh = 10.0f, windDirDeg = 270, windGustKmh = 30.0f,
-            rainTodayMm = 1.5f, measuredTime = "10:08:27",
-            measuredDate = "19/9/2026", stationName = "Meteo_Olomouc_CZ"
-        )
-        val r = StationMeasurementMapper.fromClientraw(m, fetchedAtMs = fetchedAt)!!
+    fun customclientraw_mapsTemperatureHumidityPressure() {
+        val m = baseCustom(temperatureC = 13.6f, humidityPct = 77, pressureHpa = 1023.7f)
+        val r = StationMeasurementMapper.fromCustomClientraw(m, fetchedAtMs = fetchedAt)!!
         assertEquals(Sources.STATION_INFOPOCASI, r.station)
-        assertEquals(18.4f, r.temperatureC!!, 0.001f)
-        assertEquals(62, r.humidityPct)
-        assertEquals(1013.2f, r.pressureHpa!!, 0.001f)
+        assertEquals(13.6f, r.temperatureC!!, 0.001f)
+        assertEquals(77, r.humidityPct)
+        assertEquals(1023.7f, r.pressureHpa!!, 0.001f)
+        assertEquals(1.0f, r.rainMm!!, 0.001f)
     }
 
     @Test
-    fun clientraw_windKmhConvertedToMs() {
-        val m = ClientrawMeasurement(
-            temperatureC = 18.4f, humidityPct = 62, pressureHpa = 1013.2f,
-            windSpeedKmh = 10.0f, windDirDeg = 270, windGustKmh = 36.0f,
-            rainTodayMm = 1.5f, measuredTime = "10:08:27",
-            measuredDate = "19/9/2026", stationName = "Meteo_Olomouc_CZ"
-        )
-        val r = StationMeasurementMapper.fromClientraw(m, fetchedAtMs = fetchedAt)!!
-        assertEquals(10.0f / 3.6f, r.windMs!!, 0.001f)
-        assertEquals(36.0f / 3.6f, r.windGustMs!!, 0.001f)
+    fun customclientraw_windKmhConvertedToMs() {
+        val m = baseCustom(windSpeedKmh = 14.5f, windGustKmh = 27.3f)
+        val r = StationMeasurementMapper.fromCustomClientraw(m, fetchedAtMs = fetchedAt)!!
+        assertEquals(14.5f / 3.6f, r.windMs!!, 0.001f)
+        assertEquals(27.3f / 3.6f, r.windGustMs!!, 0.001f)
     }
 
     @Test
-    fun clientraw_measuredAt_parsedInPragueSummerTime() {
-        val m = baseClientraw(measuredTime = "10:08:27", measuredDate = "19/9/2026")
-        val r = StationMeasurementMapper.fromClientraw(m, fetchedAtMs = fetchedAt)!!
-        // 19. 9. 2026 10:08:27 Europe/Prague (CEST, UTC+2) == 08:08:27 UTC
-        val expected = LocalDateTime.of(2026, 9, 19, 10, 8, 27)
-            .atZone(ZoneId.of("Europe/Prague")).toInstant().toEpochMilli()
-        assertEquals(expected, r.measuredAtMs)
+    fun customclientraw_measuredAt_takenFromParser() {
+        val m = baseCustom(measuredAtEpochMs = 1_758_001_000_000L)
+        val r = StationMeasurementMapper.fromCustomClientraw(m, fetchedAtMs = fetchedAt)!!
+        assertEquals(1_758_001_000_000L, r.measuredAtMs)
     }
 
     @Test
-    fun clientraw_measuredAt_fallsBackToFetchedAtWhenUnparseable() {
-        val m = baseClientraw(measuredTime = null, measuredDate = null)
-        val r = StationMeasurementMapper.fromClientraw(m, fetchedAtMs = fetchedAt)!!
+    fun customclientraw_measuredAt_fallsBackToFetchedAtWhenUnparseable() {
+        val m = baseCustom(measuredAtEpochMs = null)
+        val r = StationMeasurementMapper.fromCustomClientraw(m, fetchedAtMs = fetchedAt)!!
         assertEquals(fetchedAt, r.measuredAtMs)
     }
 
     @Test
-    fun clientraw_nullFieldsStayNull() {
-        val m = baseClientraw()
-            .copy(temperatureC = null, humidityPct = null, pressureHpa = null,
-                windSpeedKmh = null, windDirDeg = null, windGustKmh = null, rainTodayMm = null)
-        val r = StationMeasurementMapper.fromClientraw(m, fetchedAtMs = fetchedAt)!!
+    fun customclientraw_nullFieldsStayNull() {
+        val m = baseCustom(
+            temperatureC = null, humidityPct = null, pressureHpa = null,
+            windSpeedKmh = null, windDirDeg = null, windGustKmh = null, rainTodayMm = null
+        )
+        val r = StationMeasurementMapper.fromCustomClientraw(m, fetchedAtMs = fetchedAt)!!
         assertNull(r.temperatureC)
         assertNull(r.humidityPct)
         assertNull(r.pressureHpa)
@@ -114,13 +101,23 @@ class StationMeasurementMapperTest {
 
     // --- helpers ------------------------------------------------------------
 
-    private fun baseClientraw(
-        measuredTime: String? = "10:08:27",
-        measuredDate: String? = "19/9/2026"
-    ) = ClientrawMeasurement(
-        temperatureC = 18.4f, humidityPct = 62, pressureHpa = 1013.2f,
-        windSpeedKmh = 10.0f, windDirDeg = 270, windGustKmh = 30.0f,
-        rainTodayMm = 1.5f, measuredTime = measuredTime,
-        measuredDate = measuredDate, stationName = "Meteo_Olomouc_CZ"
+    private fun baseCustom(
+        temperatureC: Float? = 13.6f,
+        humidityPct: Int? = 77,
+        pressureHpa: Float? = 1023.7f,
+        windSpeedKmh: Float? = 14.5f,
+        windDirDeg: Int? = 309,
+        windGustKmh: Float? = 27.3f,
+        rainTodayMm: Float? = 1.0f,
+        measuredAtEpochMs: Long? = 1_758_001_000_000L
+    ) = CustomClientrawMeasurement(
+        temperatureC = temperatureC,
+        humidityPct = humidityPct,
+        pressureHpa = pressureHpa,
+        windSpeedKmh = windSpeedKmh,
+        windDirDeg = windDirDeg,
+        windGustKmh = windGustKmh,
+        rainTodayMm = rainTodayMm,
+        measuredAtEpochMs = measuredAtEpochMs
     )
 }

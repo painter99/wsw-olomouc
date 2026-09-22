@@ -15,6 +15,15 @@ class FormatTest {
     }
 
     @Test
+    fun temperaturePrecise_oneDecimalCzechComma() {
+        // Pavel 22. 9.: "aby se teplota ukazovala detailněji, tedy na desetiny"
+        assertEquals("13,6 °C", Format.temperaturePrecise(13.6f))
+        assertEquals("5,0 °C", Format.temperaturePrecise(5.0f))
+        assertEquals("-2,3 °C", Format.temperaturePrecise(-2.26f))
+        assertEquals("—", Format.temperaturePrecise(null))
+    }
+
+    @Test
     fun humidity() {
         assertEquals("55 %", Format.humidity(55))
         assertEquals("—", Format.humidity(null))

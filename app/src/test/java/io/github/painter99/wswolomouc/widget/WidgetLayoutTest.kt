@@ -9,22 +9,18 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Widget layout tests (M1.6b-2, PRD F2.6/NF8) — pure JVM, tabulated.
+ * Widget layout tests v2 (M1.6b-2 redesign after Pavel's feedback 22. 9.):
  *
- * Layout contract:
- *  - LEFT half = existing synthesis (F2.5, unchanged rules) + secondary row
- *    (feels-like / wind / rain, max 3 items, NF8) + data age.
- *  - RIGHT half = the OTHER station, compact (Pavel's proposal d, 21. 9.).
- *  - Secondary row source = the station behind the left badge; with the
- *    average badge ("Ø 2 stanice") the non-temperature values come from the
- *    PRIMARY station (F2.5: synthesis applies to temperature only).
- *  - Rain label is shortened but honest (M1.4 semantics): "(den)" for
- *    INFOPOCASI, "(10 min)" for CHMU.
- *  - Missing values are OMITTED from the secondary row (never "0" or fake).
- *  - Wide mode (5x2) additionally shows the right station's humidity
- *    (showRightHumidity); compact 4x2 does not.
- *  - Contrast: every widget text color >= 7:1 vs black, status dots >= 4.5:1
- *    (WidgetPaletteTest).
+ *  1. LEFT = synthesis value (F2.5 fallback rules — ALWAYS some value) +
+ *     secondary row (feels-like / wind / rain, max 3, from the station
+ *     behind the badge) + age.
+ *  2. BOTH stations must appear on the widget, each with the time of its
+ *     last real measurement (Pavel: "na widgetu musí být zmíněné obě
+ *     stanice a u každé čas poslední reálné aktualizace").
+ *  3. NO gray text — every text color is white (WidgetPaletteTest); only
+ *     the status dots are colored.
+ *  4. Temperatures are shown to one decimal ("13,6 °C", Pavel 22. 9.).
+ *  5. Rain label shortened but honest (M1.4): "(den)" / "(10 min)".
  */
 class WidgetLayoutTest {
 
@@ -64,7 +60,7 @@ class WidgetLayoutTest {
     }
 
     @Test
-    fun bothFresh_leftAverage_secondaryFromPrimary_rightIsOtherStation() {
+    fun bothFresh_leftAverage_secondaryFromPrimary() {
         val s = build(
             infopocasi = measurement(
                 Sources.STATION_INFOPOCASI, 21.0f, 5, windMs = 3.0f, rainMm = 0.5f
@@ -73,45 +69,50 @@ class WidgetLayoutTest {
                 Sources.STATION_CHMU, 23.0f, 10, humidityPct = 68, windMs = 4.0f, rainMm = 0.2f
             )
         )
-        // Left half: existing synthesis rules (F2.5), unchanged.
         assertEquals(22.0f, s.left.temperatureC!!, 0.001f)
         assertEquals("Ø 2 stanice", s.left.badge)
         assertEquals(WidgetStatus.OK, s.left.status)
         assertEquals(Sources.STATION_INFOPOCASI, s.left.sourceStation)
         assertEquals(now - 10 * minute, s.left.measuredAtMs) // honest age = older
-        // Secondary row from the PRIMARY station (F2.5: synthesis is temp only).
+        // Secondary row from the PRIMARY station (F2.5: synthesis is temp only)
         assertEquals(listOf("Pocitová", "Vítr", "Srážky"), s.secondary.map { it.label })
-        assertEquals("21 °C", s.secondary[0].text)   // T=21 outside WC and HI domains
-        assertEquals("11 km/h", s.secondary[1].text) // 3.0 m/s -> 10.8 -> 11 km/h, ONCE
+        assertEquals("21,0 °C", s.secondary[0].text)  // one decimal (Pavel 22. 9.)
+        assertEquals("11 km/h", s.secondary[1].text)  // 3.0 m/s -> ONCE to km/h
         assertEquals("0,5 mm (den)", s.secondary[2].text)
-        // Right half = the OTHER station, compact.
-        assertEquals("ČHMÚ Holice", s.right.name)
-        assertEquals(23.0f, s.right.temperatureC!!, 0.001f)
-        assertTrue(s.right.hasData)
-        assertFalse(s.right.isStale)
-        assertEquals(68, s.right.humidityPct)
-        assertEquals(now - 10 * minute, s.right.measuredAtMs)
+    }
+
+    @Test
+    fun bothStations_alwaysPresent_withTheirOwnMeasurementAge() {
+        val s = build(
+            infopocasi = measurement(Sources.STATION_INFOPOCASI, 13.6f, 3),
+            chmu = measurement(Sources.STATION_CHMU, 14.2f, 34, humidityPct = 68)
+        )
+        assertEquals(2, s.stations.size)
+        assertEquals("Infopocasi", s.stations[0].name)
+        assertEquals(13.6f, s.stations[0].temperatureC!!, 0.001f)
+        assertTrue(s.stations[0].hasData)
+        assertFalse(s.stations[0].isStale)
+        assertEquals(now - 3 * minute, s.stations[0].measuredAtMs)
+        assertEquals("ČHMÚ Holice", s.stations[1].name)
+        assertEquals(14.2f, s.stations[1].temperatureC!!, 0.001f)
+        assertTrue(s.stations[1].hasData)
+        assertTrue(s.stations[1].isStale)   // 34 min > 30 min threshold
+        assertEquals(now - 34 * minute, s.stations[1].measuredAtMs)
     }
 
     @Test
     fun feelsLike_usesSingleWindConversion() {
-        // 5 °C + 4.17 m/s = 15.012 km/h -> WC = 1.75 °C -> "2 °C".
-        // Double conversion (54 km/h as m/s) would give WC = -1.5 -> "-2 °C";
-        // no conversion (4.17 km/h <= 4.8) would leave "5 °C".
+        // 5 °C + 4.17 m/s = 15.012 km/h -> WC = 1.75 °C -> "1,7 °C".
+        // Double conversion would give "-1,5 °C", no conversion "5,0 °C".
         val s = build(
             infopocasi = measurement(
                 Sources.STATION_INFOPOCASI, 5.0f, 5, windMs = 4.17f
             ),
             chmu = measurement(Sources.STATION_CHMU, 12.0f, 120)
         )
-        assertEquals("Infopocasi", s.left.badge)
-        assertEquals(Sources.STATION_INFOPOCASI, s.left.sourceStation)
-        assertEquals("2 °C", s.secondary[0].text)
-        assertEquals("15 km/h", s.secondary[1].text) // 4.17 m/s -> 15.012 -> 15
-        assertEquals(2, s.secondary.size)            // rain null -> omitted
-        // Right half = the stale other station.
-        assertEquals("ČHMÚ Holice", s.right.name)
-        assertTrue(s.right.isStale)
+        assertEquals("1,7 °C", s.secondary[0].text)
+        assertEquals("15 km/h", s.secondary[1].text)
+        assertEquals(2, s.secondary.size) // rain null -> omitted
     }
 
     @Test
@@ -121,11 +122,11 @@ class WidgetLayoutTest {
             chmu = null
         )
         assertEquals(listOf("Pocitová"), s.secondary.map { it.label })
-        assertEquals("5 °C", s.secondary[0].text)
+        assertEquals("5,0 °C", s.secondary[0].text)
     }
 
     @Test
-    fun onlyChmuFresh_secondaryFromChmu_rainLabelTenMin_rightInfopocasiStale() {
+    fun onlyChmuFresh_secondaryFromChmu_rainLabelTenMin() {
         val s = build(
             infopocasi = measurement(Sources.STATION_INFOPOCASI, 12.0f, 120),
             chmu = measurement(
@@ -134,65 +135,56 @@ class WidgetLayoutTest {
         )
         assertEquals("ČHMÚ Holice", s.left.badge)
         assertEquals(Sources.STATION_CHMU, s.left.sourceStation)
-        assertEquals(listOf("Pocitová", "Vítr", "Srážky"), s.secondary.map { it.label })
-        assertEquals("18 °C", s.secondary[0].text)   // T=18 outside WC and HI domains
+        assertEquals("18,0 °C", s.secondary[0].text) // T=18 outside WC and HI domains
         assertEquals("14 km/h", s.secondary[1].text)
         assertEquals("0,2 mm (10 min)", s.secondary[2].text)
-        // Right half = the OTHER station (Infopocasi), stale.
-        assertEquals("Infopocasi", s.right.name)
-        assertTrue(s.right.hasData)
-        assertTrue(s.right.isStale)
-        assertEquals(now - 120 * minute, s.right.measuredAtMs)
+        // Both stations still present; Infopocasi is the stale one.
+        assertTrue(s.stations[0].isStale)
+        assertFalse(s.stations[1].isStale)
     }
 
     @Test
-    fun rightStationWithoutData_placeholder() {
+    fun stationWithoutData_placeholderBlock() {
         val s = build(
             infopocasi = measurement(Sources.STATION_INFOPOCASI, 12.0f, 3),
             chmu = null
         )
-        assertEquals("ČHMÚ Holice", s.right.name)
-        assertFalse(s.right.hasData)
-        assertNull(s.right.temperatureC)
-        assertNull(s.right.measuredAtMs)
-        assertFalse(s.right.isStale)
+        assertFalse(s.stations[1].hasData)
+        assertEquals("ČHMÚ Holice", s.stations[1].name)
+        assertNull(s.stations[1].temperatureC)
+        assertNull(s.stations[1].measuredAtMs)
+        assertFalse(s.stations[1].isStale)
     }
 
     @Test
-    fun wideFlag_controlsRightHumidityVisibility() {
-        val infopocasi = measurement(Sources.STATION_INFOPOCASI, 21.0f, 5, windMs = 3.0f)
-        val chmu = measurement(Sources.STATION_CHMU, 23.0f, 10, humidityPct = 68)
-        assertFalse(build(infopocasi, chmu, wide = false).showRightHumidity)
-        assertTrue(build(infopocasi, chmu, wide = true).showRightHumidity)
-    }
-
-    @Test
-    fun offline_emptySecondary_rightPlaceholder() {
+    fun offline_leftWithoutValue_bothStationBlocksPlaceholder() {
         val s = build(null, null)
         assertEquals(WidgetStatus.OFFLINE, s.left.status)
         assertNull(s.left.temperatureC)
         assertTrue(s.secondary.isEmpty())
-        assertEquals("ČHMÚ Holice", s.right.name)
-        assertFalse(s.right.hasData)
+        assertFalse(s.stations[0].hasData)
+        assertFalse(s.stations[1].hasData)
     }
 
     @Test
     fun secondary_omitsMissingValues_showsOnlyAvailable() {
-        // Left station has no temperature (fresh) -> no Pocitová item;
-        // wind present, rain null -> exactly one item.
         val s = build(
             infopocasi = measurement(
                 Sources.STATION_INFOPOCASI, null, 5, windMs = 3.0f
             ),
-            chmu = measurement(Sources.STATION_CHMU, 14.0f, 120)
+            chmu = measurement(Sources.STATION_CHMU, 14.2f, 120)
         )
         assertEquals("Infopocasi", s.left.badge)
         assertNull(s.left.temperatureC)
         assertEquals(listOf("Vítr"), s.secondary.map { it.label })
         assertEquals("11 km/h", s.secondary[0].text)
-        // Right half = the stale other station with its value.
-        assertEquals("ČHMÚ Holice", s.right.name)
-        assertEquals(14.0f, s.right.temperatureC!!, 0.001f)
-        assertTrue(s.right.isStale)
+    }
+
+    @Test
+    fun wideFlag_controlsStationHumidityVisibility() {
+        val infopocasi = measurement(Sources.STATION_INFOPOCASI, 21.0f, 5, windMs = 3.0f)
+        val chmu = measurement(Sources.STATION_CHMU, 23.0f, 10, humidityPct = 68)
+        assertFalse(build(infopocasi, chmu, wide = false).showStationHumidity)
+        assertTrue(build(infopocasi, chmu, wide = true).showStationHumidity)
     }
 }

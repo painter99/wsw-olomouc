@@ -15,7 +15,11 @@ import org.junit.Test
 
 /**
  * InfopocasiDataSource integration tests over MockWebServer — no real network.
- * Fixture = real station data captured 2026-09-19 (same file as parser tests).
+ *
+ * M1.6b-2 data fix: the source is customclientraw.txt (labeled JSON with
+ * declared units). Fixture = real station data captured 2026-09-22; values
+ * cross-checked against CHMU Holice (temp 13.6 == 13.6) and the station's
+ * WeatherDisplay labels.
  */
 class InfopocasiDataSourceTest {
 
@@ -33,11 +37,11 @@ class InfopocasiDataSourceTest {
     }
 
     private fun fixture(): String =
-        javaClass.getResourceAsStream("/clientraw_fixture.txt")!!
+        javaClass.getResourceAsStream("/customclientraw_fixture.json")!!
             .bufferedReader().use { it.readText() }
 
     private fun dataSource(): InfopocasiDataSource =
-        InfopocasiDataSource(OkHttpClient(), url = server.url("/clientraw.txt").toString())
+        InfopocasiDataSource(OkHttpClient(), url = server.url("/customclientraw.txt").toString())
 
     @Test
     fun fetch_parsesFixtureIntoUnifiedMeasurement() = runTest {
@@ -47,8 +51,10 @@ class InfopocasiDataSourceTest {
 
         assertNotNull(m)
         assertEquals(Sources.STATION_INFOPOCASI, m!!.station)
-        assertEquals(2.7f, m.temperatureC!!, 0.01f)    // values verified in M1.2 parser tests
-        assertEquals(1022.8f, m.pressureHpa!!, 0.01f)
+        assertEquals(13.6f, m.temperatureC!!, 0.01f)
+        assertEquals(1023.7f, m.pressureHpa!!, 0.01f)
+        assertEquals(1.0f, m.rainMm!!, 0.01f)          // daily total (rfall)
+        assertEquals(14.5f / 3.6f, m.windMs!!, 0.01f)  // km/h -> m/s
         assertTrue(m.measuredAtMs > 0)
         assertTrue(m.fetchedAtMs > 0)
     }
@@ -69,7 +75,7 @@ class InfopocasiDataSourceTest {
 
     @Test
     fun fetch_garbageBody_returnsNull() = runTest {
-        server.enqueue(MockResponse().setBody("not a clientraw file"))
+        server.enqueue(MockResponse().setBody("not a customclientraw file"))
         assertNull(dataSource().fetch())
     }
 }

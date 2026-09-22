@@ -1,4 +1,4 @@
-# CI run 58 — commit aa750df — m16b3-per-source-status
+# CI run 59 — commit e6a97ea — m16b3-per-source-status
 
 ===== build_output.txt =====
 Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
@@ -29,8 +29,8 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
-> Task :app:javaPreCompileDebugUnitTest
 > Task :app:processDebugManifestForPackage
+> Task :app:javaPreCompileDebugUnitTest
 > Task :app:javaPreCompileDebug
 > Task :app:processDebugResources
 > Task :app:kspDebugKotlin
@@ -56,25 +56,10 @@ w: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/
 
 > Task :app:testDebugUnitTest
 
-WeatherRepositoryTest > refresh_allSourcesRateLimited_reportsSkip FAILED
-    java.lang.AssertionError at WeatherRepositoryTest.kt:258
-
-WeatherRepositoryTest > refresh_setsNextRefreshAllowedAt FAILED
-    java.lang.AssertionError at WeatherRepositoryTest.kt:248
-
-MainUiStateMapperTest > fromSnapshot_mapsPerSourceStatusLabels FAILED
-    java.lang.AssertionError at MainUiStateMapperTest.kt:188
-
-MainUiStateMapperTest > fromSnapshot_placeholderCarriesSourceStatusNote FAILED
-    java.lang.AssertionError at MainUiStateMapperTest.kt:221
-
-MainUiStateMapperTest > fromSnapshot_networkAndParseErrors_getHumanLabels FAILED
-    java.lang.AssertionError at MainUiStateMapperTest.kt:205
-
 MainViewModelTest > refresh_withinRateLimit_showsRateLimitMessage FAILED
     java.lang.AssertionError at MainViewModelTest.kt:154
 
-118 tests completed, 6 failed
+118 tests completed, 1 failed
 
 > Task :app:testDebugUnitTest FAILED
 
@@ -248,29 +233,24 @@ Caused by: org.gradle.api.internal.exceptions.MarkedVerificationException: There
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
 
 
-BUILD FAILED in 2m 2s
+BUILD FAILED in 2m 45s
 30 actionable tasks: 30 executed
 
 ===== junit summary =====
-<testsuite name="io.github.painter99.wswolomouc.SourcesTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.039">
-<testsuite name="io.github.painter99.wswolomouc.data.ChmuDataSourceTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.63">
-<testsuite name="io.github.painter99.wswolomouc.data.ChmuJsonParserTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.025">
-<testsuite name="io.github.painter99.wswolomouc.data.CustomClientrawParserTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.021">
-<testsuite name="io.github.painter99.wswolomouc.data.InfopocasiDataSourceTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.059">
-<testsuite name="io.github.painter99.wswolomouc.data.StationMeasurementMapperTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.003">
-<testsuite name="io.github.painter99.wswolomouc.data.WeatherRepositoryTest" tests="14" skipped="0" failures="2" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.041">
-    <failure message="java.lang.AssertionError" type="java.lang.AssertionError">java.lang.AssertionError
-    <failure message="java.lang.AssertionError: expected:&lt;1758000600000&gt; but was:&lt;null&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;1758000600000&gt; but was:&lt;null&gt;
-<testsuite name="io.github.painter99.wswolomouc.sync.SyncScheduleTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.001">
-<testsuite name="io.github.painter99.wswolomouc.ui.FeelsLikeTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.001">
-<testsuite name="io.github.painter99.wswolomouc.ui.FormatTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.052">
-<testsuite name="io.github.painter99.wswolomouc.ui.MainUiStateMapperTest" tests="12" skipped="0" failures="3" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.007">
-    <failure message="java.lang.AssertionError: expected:&lt;OK&gt; but was:&lt;null&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;OK&gt; but was:&lt;null&gt;
-    <failure message="java.lang.AssertionError: expected:&lt;HTTP 404&gt; but was:&lt;null&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;HTTP 404&gt; but was:&lt;null&gt;
-    <failure message="java.lang.AssertionError: expected:&lt;síť&gt; but was:&lt;null&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;síť&gt; but was:&lt;null&gt;
-<testsuite name="io.github.painter99.wswolomouc.ui.MainViewModelTest" tests="5" skipped="0" failures="1" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.018">
+<testsuite name="io.github.painter99.wswolomouc.SourcesTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.059">
+<testsuite name="io.github.painter99.wswolomouc.data.ChmuDataSourceTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.61">
+<testsuite name="io.github.painter99.wswolomouc.data.ChmuJsonParserTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.023">
+<testsuite name="io.github.painter99.wswolomouc.data.CustomClientrawParserTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.014">
+<testsuite name="io.github.painter99.wswolomouc.data.InfopocasiDataSourceTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.05">
+<testsuite name="io.github.painter99.wswolomouc.data.StationMeasurementMapperTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.001">
+<testsuite name="io.github.painter99.wswolomouc.data.WeatherRepositoryTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.04">
+<testsuite name="io.github.painter99.wswolomouc.sync.SyncScheduleTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.001">
+<testsuite name="io.github.painter99.wswolomouc.ui.FeelsLikeTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.001">
+<testsuite name="io.github.painter99.wswolomouc.ui.FormatTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.037">
+<testsuite name="io.github.painter99.wswolomouc.ui.MainUiStateMapperTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.003">
+<testsuite name="io.github.painter99.wswolomouc.ui.MainViewModelTest" tests="5" skipped="0" failures="1" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.03">
     <failure message="java.lang.AssertionError: was null" type="java.lang.AssertionError">java.lang.AssertionError: was null
-<testsuite name="io.github.painter99.wswolomouc.ui.RelativeTimeFormatterTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.005">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetLayoutTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.012">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetPaletteTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:52" hostname="runnervmlun5p" time="0.013">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetSynthesisTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:18:53" hostname="runnervmlun5p" time="0.002">
+<testsuite name="io.github.painter99.wswolomouc.ui.RelativeTimeFormatterTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.006">
+<testsuite name="io.github.painter99.wswolomouc.widget.WidgetLayoutTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.009">
+<testsuite name="io.github.painter99.wswolomouc.widget.WidgetPaletteTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.004">
+<testsuite name="io.github.painter99.wswolomouc.widget.WidgetSynthesisTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-22T16:23:55" hostname="runnervmlun5p" time="0.003">

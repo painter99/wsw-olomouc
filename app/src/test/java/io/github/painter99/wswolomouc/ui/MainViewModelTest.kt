@@ -91,7 +91,7 @@ class MainViewModelTest {
     private suspend fun awaitLoaded(vm: MainViewModel): MainUiState =
         withContext(Dispatchers.IO) {
             withTimeout(TimeUnit.SECONDS.toMillis(5)) {
-                while (vm.uiState.value.isLoading) delay(10)
+                while (vm.uiState.value.isLoading || vm.uiState.value.isRefreshing) delay(10)
             }
             vm.uiState.value
         }

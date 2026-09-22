@@ -26,7 +26,8 @@ class MainUiStateMapperTest {
     private fun measurement(
         station: String,
         measuredAtMs: Long = now,
-        rainMm: Float? = 1.5f
+        rainMm: Float? = 1.5f,
+        rainDailyMm: Float? = 1.2f
     ) = StationMeasurement(
         station = station,
         temperatureC = 21.4f,
@@ -36,6 +37,7 @@ class MainUiStateMapperTest {
         windGustMs = 8f,
         windDirDeg = 200,
         rainMm = rainMm,
+        rainDailyMm = rainDailyMm,
         measuredAtMs = measuredAtMs,
         fetchedAtMs = now
     )
@@ -61,15 +63,27 @@ class MainUiStateMapperTest {
     }
 
     @Test
-    fun stationUi_rainLabelDiffersPerSource() {
+    fun stationUi_rainLabelUnified_dailyForBothSources() {
+        // Pavel 22. 9.: both stations must show the SAME parameter (daily total)
         assertEquals(
             "úhrn za den",
             MainUiStateMapper.stationUi(measurement(Sources.STATION_INFOPOCASI), now).rainLabel
         )
         assertEquals(
-            "úhrn za 10 min",
+            "úhrn za den",
             MainUiStateMapper.stationUi(measurement(Sources.STATION_CHMU), now).rainLabel
         )
+    }
+
+    @Test
+    fun stationUi_showsDailyRain_notRawTenMinuteValue() {
+        // CHMU raw rainMm = 0.3 (last 10 min) must NOT be displayed;
+        // the card shows the unified daily total (0.6) instead.
+        val ui = MainUiStateMapper.stationUi(
+            measurement(Sources.STATION_CHMU, rainMm = 0.3f, rainDailyMm = 0.6f), now
+        )
+        assertEquals(0.6f, ui.rainDailyMm!!, 0.001f)
+        assertEquals("úhrn za den", ui.rainLabel)
     }
 
     /**

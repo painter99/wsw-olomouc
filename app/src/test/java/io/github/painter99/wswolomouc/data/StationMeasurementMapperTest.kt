@@ -28,6 +28,7 @@ class StationMeasurementMapperTest {
         assertEquals(77, r.humidityPct)
         assertEquals(1023.7f, r.pressureHpa!!, 0.001f)
         assertEquals(1.0f, r.rainMm!!, 0.001f)
+        assertEquals(1.0f, r.rainDailyMm!!, 0.001f) // rfall IS the daily total
     }
 
     @Test
@@ -66,6 +67,7 @@ class StationMeasurementMapperTest {
         assertNull(r.windGustMs)
         assertNull(r.windDirDeg)
         assertNull(r.rainMm)
+        assertNull(r.rainDailyMm)
     }
 
     // --- CHMU mapping -------------------------------------------------------
@@ -76,7 +78,8 @@ class StationMeasurementMapperTest {
             stationCode = Sources.CHMU_STATION_CODE,
             measuredAtEpochMs = 1_758_001_000_000L,
             temperatureC = 14.5f, humidityPct = 70,
-            windSpeedMs = 3.2f, windGustMs = 8.1f, windDirDeg = 225, rain10mMm = 0.3f
+            windSpeedMs = 3.2f, windGustMs = 8.1f, windDirDeg = 225, rain10mMm = 0.3f,
+            rainDailyMm = 0.6f
         )
         val r = StationMeasurementMapper.fromChmu(m, fetchedAtMs = fetchedAt)!!
         assertEquals(Sources.STATION_CHMU, r.station)
@@ -84,7 +87,8 @@ class StationMeasurementMapperTest {
         assertEquals(8.1f, r.windGustMs!!, 0.001f)
         assertNull(r.pressureHpa)                    // 10M feed has no pressure
         assertEquals(14.5f, r.temperatureC!!, 0.001f)
-        assertEquals(0.3f, r.rainMm!!, 0.001f)       // semantics: last 10 min
+        assertEquals(0.3f, r.rainMm!!, 0.001f)       // raw: last 10 min (DB/history)
+        assertEquals(0.6f, r.rainDailyMm!!, 0.001f)  // daily total for the UI
     }
 
     @Test

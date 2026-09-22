@@ -33,7 +33,8 @@ class WidgetLayoutTest {
         ageMin: Long,
         humidityPct: Int? = 60,
         windMs: Float? = null,
-        rainMm: Float? = null
+        rainMm: Float? = null,
+        rainDailyMm: Float? = null
     ): StationMeasurement = StationMeasurement(
         station = station,
         temperatureC = tempC,
@@ -43,6 +44,7 @@ class WidgetLayoutTest {
         windGustMs = null,
         windDirDeg = null,
         rainMm = rainMm,
+        rainDailyMm = rainDailyMm,
         measuredAtMs = now - ageMin * minute,
         fetchedAtMs = now
     )
@@ -63,10 +65,10 @@ class WidgetLayoutTest {
     fun bothFresh_leftAverage_secondaryFromPrimary() {
         val s = build(
             infopocasi = measurement(
-                Sources.STATION_INFOPOCASI, 21.0f, 5, windMs = 3.0f, rainMm = 0.5f
+                Sources.STATION_INFOPOCASI, 21.0f, 5, windMs = 3.0f, rainDailyMm = 0.5f
             ),
             chmu = measurement(
-                Sources.STATION_CHMU, 23.0f, 10, humidityPct = 68, windMs = 4.0f, rainMm = 0.2f
+                Sources.STATION_CHMU, 23.0f, 10, humidityPct = 68, windMs = 4.0f, rainDailyMm = 0.2f
             )
         )
         assertEquals(22.0f, s.left.temperatureC!!, 0.001f)
@@ -78,7 +80,7 @@ class WidgetLayoutTest {
         assertEquals(listOf("Pocitová", "Vítr", "Srážky"), s.secondary.map { it.label })
         assertEquals("21,0 °C", s.secondary[0].text)  // one decimal (Pavel 22. 9.)
         assertEquals("11 km/h", s.secondary[1].text)  // 3.0 m/s -> ONCE to km/h
-        assertEquals("0,5 mm (den)", s.secondary[2].text)
+        assertEquals("0,5 mm (den)", s.secondary[2].text) // daily, BOTH sources
     }
 
     @Test
@@ -126,18 +128,18 @@ class WidgetLayoutTest {
     }
 
     @Test
-    fun onlyChmuFresh_secondaryFromChmu_rainLabelTenMin() {
+    fun onlyChmuFresh_secondaryFromChmu_dailyRainLabel() {
         val s = build(
             infopocasi = measurement(Sources.STATION_INFOPOCASI, 12.0f, 120),
             chmu = measurement(
-                Sources.STATION_CHMU, 18.0f, 12, humidityPct = 68, windMs = 4.0f, rainMm = 0.2f
+                Sources.STATION_CHMU, 18.0f, 12, humidityPct = 68, windMs = 4.0f, rainDailyMm = 0.2f
             )
         )
         assertEquals("ČHMÚ Holice", s.left.badge)
         assertEquals(Sources.STATION_CHMU, s.left.sourceStation)
         assertEquals("18,0 °C", s.secondary[0].text) // T=18 outside WC and HI domains
         assertEquals("14 km/h", s.secondary[1].text)
-        assertEquals("0,2 mm (10 min)", s.secondary[2].text)
+        assertEquals("0,2 mm (den)", s.secondary[2].text) // unified daily label
         // Both stations still present; Infopocasi is the stale one.
         assertTrue(s.stations[0].isStale)
         assertFalse(s.stations[1].isStale)

@@ -1,4 +1,4 @@
-# CI run 62 — commit 0cb663e — m16b3-per-source-status
+# CI run 63 — commit 8d94047 — m16b3-per-source-status
 
 ===== build_output.txt =====
 Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
@@ -28,10 +28,10 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:parseDebugLocalResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
-> Task :app:processDebugManifestForPackage
-> Task :app:javaPreCompileDebug
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
 > Task :app:javaPreCompileDebugUnitTest
+> Task :app:processDebugManifestForPackage
+> Task :app:javaPreCompileDebug
 > Task :app:processDebugResources
 > Task :app:kspDebugKotlin
 
@@ -46,48 +46,62 @@ e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/
 e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:53:5 'fetchResult' overrides nothing.
 e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:53:41 Unresolved reference 'FetchResult'.
 e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:53:55 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:53:55 Not enough information to infer type argument for 'T'.
 e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:53:83 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:60:36 Unresolved reference 'FetchResult'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:63:32 Unresolved reference 'ChmuJsonParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:64:47 Unresolved reference 'FetchResult'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:67:21 Unresolved reference 'FetchResult'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:68:25 Unresolved reference 'StationMeasurementMapper'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:72:25 Unresolved reference 'FetchResult'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:75:13 Unresolved reference 'FetchResult'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:80:70 Unresolved reference 'StationMeasurement'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:81:30 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:81:34 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:82:13 Unresolved reference 'ChmuJsonParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:84:16 Unresolved reference 'StationMeasurement'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:90:32 Unresolved reference 'windGustMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:91:32 Unresolved reference 'windDirDeg'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:92:28 Unresolved reference 'rain10mMm'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:93:33 Unresolved reference 'rainDailyMm'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:118:21 Unresolved reference 'ChmuPortalParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:120:31 Unresolved reference 'FetchResult'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:123:17 Unresolved reference 'not' for operator '!'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:123:20 Unresolved reference 'unit'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:124:31 Unresolved reference 'FetchResult'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:124:74 Unresolved reference 'unit'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:54:9 Not enough information to infer type argument for 'K'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:58:13 Not enough information to infer type argument for 'K'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:59:17 Not enough information to infer type argument for 'K'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:59:32 Unresolved reference 'FetchResult'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:60:20 Not enough information to infer type argument for 'K'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:61:28 Unresolved reference 'ChmuJsonParser'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:62:17 Not enough information to infer type argument for 'K'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:63:21 Unresolved reference 'FetchResult'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:65:21 Unresolved reference 'FetchResult'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:66:25 Unresolved reference 'StationMeasurementMapper'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:70:17 Unresolved reference 'FetchResult'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:73:13 Unresolved reference 'FetchResult'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:78:31 Unresolved reference 'PortalMeasurement'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:78:70 Unresolved reference 'StationMeasurement'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:79:30 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:79:34 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:80:13 Unresolved reference 'ChmuJsonParser'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:80:78 Unresolved reference 'measuredAtEpochMs'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:82:16 Unresolved reference 'StationMeasurement'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:84:35 Unresolved reference 'temperatureC'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:85:34 Unresolved reference 'humidityPct'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:87:29 Unresolved reference 'windSpeedMs'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:88:32 Unresolved reference 'windGustMs'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:89:32 Unresolved reference 'windDirDeg'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:90:28 Unresolved reference 'rain10mMm'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:91:33 Unresolved reference 'rainDailyMm'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:92:35 Unresolved reference 'measuredAtEpochMs'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:98:32 Unresolved reference 'PortalMeasurement'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:117:21 Unresolved reference 'ChmuPortalParser'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:119:31 Unresolved reference 'FetchResult'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:122:17 Unresolved reference 'not' for operator '!'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:122:20 Unresolved reference 'unit'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:123:31 Unresolved reference 'FetchResult'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:123:74 Unresolved reference 'unit'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:127:19 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:127:23 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:127:25 Unresolved reference 'ChmuPortalParser'.
 e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:128:19 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:128:23 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:128:25 Unresolved reference 'ChmuPortalParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:129:19 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:129:19 Not enough information to infer type argument for 'T'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:129:26 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:129:31 Unresolved reference 'unit'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:128:19 Not enough information to infer type argument for 'T'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:128:26 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:128:31 Unresolved reference 'unit'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:130:19 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:130:23 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:130:25 Unresolved reference 'ChmuPortalParser'.
 e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:131:19 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:131:23 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:131:25 Unresolved reference 'ChmuPortalParser'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:132:19 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:132:19 Not enough information to infer type argument for 'T'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:132:26 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:132:31 Unresolved reference 'unit'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:134:34 Unresolved reference 'value'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:135:37 Unresolved reference 'value'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:136:36 Unresolved reference 'value'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:137:39 Unresolved reference 'measuredAtEpochMs'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:140:23 Unresolved reference 'FetchResult'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:131:19 Not enough information to infer type argument for 'T'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:131:26 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:131:31 Unresolved reference 'unit'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:132:20 Unresolved reference 'PortalMeasurement'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:133:34 Unresolved reference 'value'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:134:37 Unresolved reference 'value'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:135:36 Unresolved reference 'value'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:136:39 Unresolved reference 'measuredAtEpochMs'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/ChmuDataSource.kt:139:23 Unresolved reference 'FetchResult'.
 e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/di/AppModule.kt:10:44 Unresolved reference 'ChmuDataSource'.
 e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/di/AppModule.kt:61:17 Unresolved reference 'ChmuDataSource'.
 
@@ -293,6 +307,6 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 1m 37s
+BUILD FAILED in 1m 42s
 17 actionable tasks: 17 executed
 

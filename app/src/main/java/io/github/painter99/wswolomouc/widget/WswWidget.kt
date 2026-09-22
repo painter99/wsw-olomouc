@@ -115,11 +115,12 @@ fun WidgetContent(layout: WidgetLayoutState, nowMs: Long) {
         modifier = GlanceModifier
             .fillMaxSize()
             .background(ColorProvider(Color.Black))
-            .padding(10.dp),
+            .padding(10.dp)
+            .clickable(actionStartActivity<MainActivity>()),
         horizontalAlignment = Alignment.Start,
         verticalAlignment = Alignment.Top
     ) {
-        // LEFT half: synthesis + secondary row + age (F2.5/F2.6/NF8).
+        // LEFT half: synthesis + secondary quantities (one per line) + age.
         Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
                 text = "●",
@@ -134,9 +135,9 @@ fun WidgetContent(layout: WidgetLayoutState, nowMs: Long) {
                 text = layout.left.badge,
                 style = textStyle(14)
             )
-            if (layout.secondary.isNotEmpty()) {
+            for (item in layout.secondary) {
                 Text(
-                    text = layout.secondary.joinToString(" · ") { "${it.label} ${it.text}" },
+                    text = "${item.label} ${item.text}",
                     style = textStyle(14)
                 )
             }

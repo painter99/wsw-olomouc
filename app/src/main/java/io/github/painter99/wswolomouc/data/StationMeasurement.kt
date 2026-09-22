@@ -6,8 +6,10 @@ import io.github.painter99.wswolomouc.Sources
  * Unified measurement from one station, independent of the wire format (M1.4).
  *
  * Units follow the PRD data model: wind in m/s, pressure in hPa, rain in mm.
- * Rain semantics differ per source and MUST be surfaced in the UI:
- *  - INFOPOCASI: daily total (customclientraw `rfall`, M1.6b-2)
+ * Rain semantics (M1.6b-2 unification, Pavel 22. 9.): the UI shows the
+ * DAILY total for BOTH stations ([rainDailyMm], label "úhrn za den").
+ * [rainMm] keeps the raw per-source value for the DB/history:
+ *  - INFOPOCASI: daily total (customclientraw `rfall`)
  *  - CHMU_HOLICE: accumulation of the last 10 minutes (element SRA10M)
  *
  * Pressure is present only for INFOPOCASI — the CHMU 10M feed has no P
@@ -21,9 +23,17 @@ data class StationMeasurement(
     val windMs: Float?,
     val windGustMs: Float?,
     val windDirDeg: Int?,
+    /** Raw source value: INFOPOCASI daily total / CHMU last 10 min (DB, history). */
     val rainMm: Float?,
     val measuredAtMs: Long,       // measurement time from the source (epoch ms UTC)
-    val fetchedAtMs: Long         // fetch time (epoch ms UTC)
+    val fetchedAtMs: Long,        // fetch time (epoch ms UTC)
+    /**
+     * DAILY precipitation total for BOTH sources (M1.6b-2 unification,
+     * Pavel 22. 9.): INFOPOCASI = rfall; CHMU = sum of all SRA10M rows of
+     * the day from the daily 10M file. The UI displays THIS value with the
+     * label "úhrn za den" for both stations; [rainMm] stays raw for history.
+     */
+    val rainDailyMm: Float? = null
 )
 
 /**
@@ -53,6 +63,7 @@ object StationMeasurementMapper {
         windGustMs = m.windGustKmh?.div(KMH_PER_MS),
         windDirDeg = m.windDirDeg,
         rainMm = m.rainTodayMm,
+        rainDailyMm = m.rainTodayMm, // rfall IS the daily total
         measuredAtMs = m.measuredAtEpochMs ?: fetchedAtMs,
         fetchedAtMs = fetchedAtMs
     )
@@ -70,6 +81,7 @@ object StationMeasurementMapper {
         windGustMs = m.windGustMs,
         windDirDeg = m.windDirDeg,
         rainMm = m.rain10mMm,
+        rainDailyMm = m.rainDailyMm, // exact sum of the day's SRA10M rows
         measuredAtMs = m.measuredAtEpochMs,
         fetchedAtMs = fetchedAtMs
     )

@@ -50,8 +50,8 @@ data class WidgetLayoutState(
  *     time (honest per-source age).
  *  3. Feels-like uses FeelsLike.calculate(T, windMs * 3.6, RH) — wind is
  *     converted km/h EXACTLY ONCE here (M1.6a.1 contract).
- *  4. Rain label is shortened but honest (M1.4 semantics): "(den)" for
- *     INFOPOCASI, "(10 min)" for CHMU.
+ *  4. Rain is the DAILY total for BOTH sources ("(den)", M1.6b-2
+ *     unification — Pavel 22. 9.); the CHMU 10-min value stays in the DB.
  *  5. Temperatures are formatted to one decimal via Format.temperaturePrecise.
  */
 object WidgetLayout {
@@ -112,15 +112,9 @@ object WidgetLayout {
             items += SecondaryItem("Pocitová", Format.temperaturePrecise(feels))
         }
         m.windMs?.let { items += SecondaryItem("Vítr", Format.wind(it)) }
-        m.rainMm?.let {
-            items += SecondaryItem("Srážky", Format.rain(it) + " (" + rainLabel(m.station) + ")")
-        }
+        // Rain unified to the DAILY total for both sources (Pavel 22. 9.);
+        // the CHMU 10-min value stays in the DB history only.
+        m.rainDailyMm?.let { items += SecondaryItem("Srážky", Format.rain(it) + " (den)") }
         return items.take(3)
-    }
-
-    private fun rainLabel(station: String): String = when (station) {
-        Sources.STATION_INFOPOCASI -> "den"
-        Sources.STATION_CHMU -> "10 min"
-        else -> "—"
     }
 }

@@ -15,5 +15,11 @@ data class ChmuMeasurement(
     val windSpeedMs: Float?,
     val windGustMs: Float?,
     val windDirDeg: Int?,
-    val rain10mMm: Float?
+    val rain10mMm: Float?,
+    /**
+     * Daily precipitation total (M1.6b-2 rain unification, Pavel 22. 9.):
+     * the 10M file contains the WHOLE day's series, so the daily total is
+     * the sum of all SRA10M rows — exact, no history needed.
+     */
+    val rainDailyMm: Float? = null
 )

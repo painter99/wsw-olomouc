@@ -199,7 +199,7 @@ fun StationCard(s: StationUi, nowMs: Long, isPrimary: Boolean) {
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Srážky ${Format.rain(s.rainMm)} (${s.rainLabel})",
+                text = "Srážky ${Format.rain(s.rainDailyMm)} (${s.rainLabel})",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(

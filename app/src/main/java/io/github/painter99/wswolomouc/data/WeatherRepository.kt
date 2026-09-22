@@ -16,6 +16,7 @@ fun StationMeasurement.toEntity(): MeasurementEntity = MeasurementEntity(
     windGustMs = windGustMs,
     windDirDeg = windDirDeg,
     rainMm = rainMm,
+    rainDailyMm = rainDailyMm,
     measuredAt = measuredAtMs,
     fetchedAt = fetchedAtMs
 )
@@ -29,6 +30,7 @@ fun MeasurementEntity.toModel(): StationMeasurement = StationMeasurement(
     windGustMs = windGustMs,
     windDirDeg = windDirDeg,
     rainMm = rainMm,
+    rainDailyMm = rainDailyMm,
     measuredAtMs = measuredAt,
     fetchedAtMs = fetchedAt
 )

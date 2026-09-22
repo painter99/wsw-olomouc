@@ -41,6 +41,8 @@ object ChmuJsonParser {
         // Latest value per element + the newest DT seen for the station.
         val latestByElement = HashMap<String, Pair<Instant, Float>>()
         var newestDt: Instant? = null
+        var rainDaily = 0f
+        var rainDailySeen = false
 
         for (i in 0 until values.length()) {
             val row = values.optJSONArray(i) ?: continue
@@ -54,6 +56,12 @@ object ChmuJsonParser {
             if (element in SUPPORTED) {
                 val value = row.optDouble(3, Double.NaN)
                 if (!value.isNaN()) {
+                    if (element == EL_RAIN) {
+                        // The daily file holds every 10-minute SRA10M row of
+                        // the day — the daily total is their exact sum.
+                        rainDaily += value.toFloat()
+                        rainDailySeen = true
+                    }
                     val existing = latestByElement[element]
                     if (existing == null || dt.isAfter(existing.first)) {
                         latestByElement[element] = dt to value.toFloat()
@@ -72,7 +80,8 @@ object ChmuJsonParser {
             windSpeedMs = latestByElement[EL_WIND]?.second,
             windGustMs = latestByElement[EL_WIND_GUST]?.second,
             windDirDeg = latestByElement[EL_WIND_DIR]?.second?.toInt(),
-            rain10mMm = latestByElement[EL_RAIN]?.second
+            rain10mMm = latestByElement[EL_RAIN]?.second,
+            rainDailyMm = if (rainDailySeen) rainDaily else null
         )
     }
 

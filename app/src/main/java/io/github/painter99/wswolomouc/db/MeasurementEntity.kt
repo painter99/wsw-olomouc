@@ -19,6 +19,8 @@ data class MeasurementEntity(
     val windGustMs: Float?,
     val windDirDeg: Int?,
     val rainMm: Float?,
+    /** Unified daily total for BOTH stations (M1.6b-2; see StationMeasurement). */
+    val rainDailyMm: Float? = null,
     val measuredAt: Long,         // measurement time from the source (epoch ms)
     val fetchedAt: Long           // fetch time (epoch ms)
 )

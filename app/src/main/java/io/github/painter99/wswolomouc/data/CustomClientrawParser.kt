@@ -74,10 +74,10 @@ object CustomClientrawParser {
         if (parts.size != 6) return null
         val nums = parts.map { it.trim().toIntOrNull() }
         if (nums.any { it == null }) return null
+        val (y, mo, d, h, mi, s) = nums.map { it!! }
         return try {
-            java.time.LocalDateTime.of(
-                nums[0], nums[1], nums[2], nums[3], nums[4], nums[5]
-            ).toInstant(java.time.ZoneOffset.UTC).toEpochMilli()
+            java.time.LocalDateTime.of(y, mo, d, h, mi, s)
+                .toInstant(java.time.ZoneOffset.UTC).toEpochMilli()
         } catch (e: Exception) {
             null
         }

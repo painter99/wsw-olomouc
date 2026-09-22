@@ -63,7 +63,13 @@ class WeatherRepository(
     data class Snapshot(
         val freshness: Freshness,
         /** Latest value per station: network result wins over cache. */
-        val measurements: Map<String, StationMeasurement>
+        val measurements: Map<String, StationMeasurement>,
+        /**
+         * Per-source outcome of the LAST refresh attempt (M1.6b-3).
+         * Sources skipped by the rate limit keep their previous entry.
+         * Empty until the repository starts recording outcomes.
+         */
+        val sourceResults: Map<String, FetchResult> = emptyMap()
     )
 
     private val lastAttemptAt = mutableMapOf<String, Long>()

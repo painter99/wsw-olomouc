@@ -13,4 +13,13 @@ interface StationDataSource {
     val id: String
 
     suspend fun fetch(): StationMeasurement?
+
+    /**
+     * Detailed fetch outcome (M1.6b-3). Default implementation wraps the
+     * legacy [fetch] result; real sources override it to report the actual
+     * failure reason (HTTP code vs. network vs. parse).
+     */
+    suspend fun fetchResult(): FetchResult =
+        fetch()?.let { FetchResult.Success(it) }
+            ?: FetchResult.ParseError("unspecified failure")
 }

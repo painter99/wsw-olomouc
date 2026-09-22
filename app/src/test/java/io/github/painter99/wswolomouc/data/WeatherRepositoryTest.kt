@@ -35,13 +35,16 @@ class WeatherRepositoryTest {
 
     private class FakeSource(
         override val id: String,
-        private var result: StationMeasurement?
+        private var result: StationMeasurement?,
+        private var detailedResult: FetchResult? = null
     ) : StationDataSource {
         var fetchCount = 0
         override suspend fun fetch(): StationMeasurement? {
             fetchCount++
             return result
         }
+        override suspend fun fetchResult(): FetchResult =
+            detailedResult ?: FetchResult.ParseError("fake default")
     }
 
     private fun measurement(
@@ -186,5 +189,54 @@ class WeatherRepositoryTest {
         val e = m.toEntity().copy(id = 7L)
         val back = e.toModel()
         assertEquals(m, back.copy(station = m.station))
+    }
+
+    // --- M1.6b-3: per-source outcome recording -------------------------------
+
+    @Test
+    fun refresh_recordsPerSourceOutcome() = runTest {
+        val ok = FakeSource(
+            "A", measurement("A", now),
+            FetchResult.Success(measurement("A", now))
+        )
+        val bad = FakeSource("B", null, FetchResult.HttpError(404))
+        val repo = WeatherRepository(listOf(ok, bad), FakeDao(), clock = { now })
+
+        val snap = repo.refresh()
+
+        assertTrue("was ${snap.sourceResults["A"]}", snap.sourceResults["A"] is FetchResult.Success)
+        assertEquals(404, (snap.sourceResults["B"] as FetchResult.HttpError).code)
+    }
+
+    @Test
+    fun refresh_fetchException_recordsNetworkError_notCrash() = runTest {
+        val exploding = object : StationDataSource {
+            override val id = "EXPLODING"
+            override suspend fun fetch(): StationMeasurement? =
+                throw java.io.IOException("network down")
+        }
+        val repo = WeatherRepository(listOf(exploding), FakeDao(), clock = { now })
+
+        val snap = repo.refresh()
+
+        assertTrue(
+            "was ${snap.sourceResults["EXPLODING"]}",
+            snap.sourceResults["EXPLODING"] is FetchResult.NetworkError
+        )
+    }
+
+    @Test
+    fun refresh_rateLimitedSource_keepsLastOutcome() = runTest {
+        val bad = FakeSource("B", null, FetchResult.NetworkError("timeout"))
+        val repo = WeatherRepository(listOf(bad), FakeDao(), clock = { now })
+
+        repo.refresh()
+        val second = repo.refresh()   // rate limited -> no new fetch
+
+        assertEquals(1, bad.fetchCount)
+        assertTrue(
+            "was ${second.sourceResults["B"]}",
+            second.sourceResults["B"] is FetchResult.NetworkError
+        )
     }
 }

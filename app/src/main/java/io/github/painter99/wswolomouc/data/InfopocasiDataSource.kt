@@ -7,10 +7,12 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 /**
- * Fetches and parses clientraw.txt from infopocasi-olomouc.cz (PRD F1.1).
+ * Fetches and parses customclientraw.txt from infopocasi-olomouc.cz
+ * (PRD F1.1 as corrected M1.6b-2, 22. 9. 2026 — labeled JSON, see
+ * [CustomClientrawParser] for why clientraw.txt indices were dropped).
  *
- * The server returns HTTP 401 without a User-Agent header (verified
- * 2026-09-19), so an identifying UA is always sent.
+ * The server previously required a User-Agent header (401 otherwise,
+ * verified 2026-09-19), so an identifying UA is always sent.
  */
 class InfopocasiDataSource(
     private val client: OkHttpClient,
@@ -29,8 +31,8 @@ class InfopocasiDataSource(
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) return@withContext null
                 val body = response.body?.string() ?: return@withContext null
-                ClientrawParser.parse(body)?.let {
-                    StationMeasurementMapper.fromClientraw(it, fetchedAtMs = clock())
+                CustomClientrawParser.parse(body)?.let {
+                    StationMeasurementMapper.fromCustomClientraw(it, fetchedAtMs = clock())
                 }
             }
         } catch (e: Exception) {

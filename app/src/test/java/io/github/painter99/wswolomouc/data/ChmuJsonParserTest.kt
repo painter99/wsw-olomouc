@@ -27,6 +27,39 @@ class ChmuJsonParserTest {
     }
 
     @Test
+    fun `daily rain is exact sum of all SRA10M rows of the day`() {
+        // Fixture rows: 0.2 + 0.0 + 0.4 (Pavel 22. 9.: unified daily totals)
+        val m = ChmuJsonParser.parse(fixture, station)!!
+        assertEquals(0.6f, m.rainDailyMm!!, 0.001f)
+        assertEquals(0.4f, m.rain10mMm) // latest 10-min value unchanged
+    }
+
+    @Test
+    fun `daily rain skips empty VAL rows`() {
+        val json = """
+            {"data":{"data":{"values":[
+              ["0-203-0-11742","SRA10M","2026-09-19T19:40:00Z","","",5.0],
+              ["0-203-0-11742","SRA10M","2026-09-19T19:50:00Z",0.3,"",5.0],
+              ["0-203-0-11742","SRA10M","2026-09-19T20:00:00Z",0.2,"",5.0]
+            ]}}}
+        """.trimIndent()
+        val m = ChmuJsonParser.parse(json, station)!!
+        assertEquals(0.5f, m.rainDailyMm!!, 0.001f)
+        assertEquals(0.2f, m.rain10mMm)
+    }
+
+    @Test
+    fun `no SRA10M rows means null daily rain`() {
+        val json = """
+            {"data":{"data":{"values":[
+              ["0-203-0-11742","T","2026-09-19T20:00:00Z",14.5,"",5.0]
+            ]}}}
+        """.trimIndent()
+        val m = ChmuJsonParser.parse(json, station)!!
+        assertNull(m.rainDailyMm)
+    }
+
+    @Test
     fun `measuredAt matches DT of latest record`() {
         val m = ChmuJsonParser.parse(fixture, station)!!
         assertEquals(Instant.parse("2026-09-19T20:00:00Z").toEpochMilli(), m.measuredAtEpochMs)

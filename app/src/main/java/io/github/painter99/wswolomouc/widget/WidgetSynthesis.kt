@@ -19,7 +19,13 @@ data class WidgetState(
     val badge: String,
     /** Measurement time of the DISPLAYED value (epoch ms), null when no data. */
     val measuredAtMs: Long?,
-    val status: WidgetStatus
+    val status: WidgetStatus,
+    /**
+     * Station the DISPLAYED value comes from (M1.6b-2): the averaged primary
+     * station for the "Ø 2 stanice" badge (F2.5: non-temperature values come
+     * from the primary), the single station's id otherwise, null when OFFLINE.
+     */
+    val sourceStation: String? = null
 )
 
 /**
@@ -51,7 +57,9 @@ object WidgetSynthesis {
                     temperatureC = avg,
                     badge = "Ø 2 stanice",
                     measuredAtMs = usable.minOf { it.measuredAtMs },
-                    status = WidgetStatus.OK
+                    status = WidgetStatus.OK,
+                    // Non-temperature values come from the PRIMARY station (F2.5).
+                    sourceStation = Sources.STATION_INFOPOCASI
                 )
             }
             usable.size == 1 -> {
@@ -60,7 +68,8 @@ object WidgetSynthesis {
                     temperatureC = m.temperatureC,
                     badge = shortName(m.station),
                     measuredAtMs = m.measuredAtMs,
-                    status = WidgetStatus.OK
+                    status = WidgetStatus.OK,
+                    sourceStation = m.station
                 )
             }
             measurements.isNotEmpty() -> {
@@ -70,7 +79,8 @@ object WidgetSynthesis {
                     temperatureC = newest.temperatureC,
                     badge = shortName(newest.station),
                     measuredAtMs = newest.measuredAtMs,
-                    status = if (fresh) WidgetStatus.OK else WidgetStatus.STALE
+                    status = if (fresh) WidgetStatus.OK else WidgetStatus.STALE,
+                    sourceStation = newest.station
                 )
             }
             else -> WidgetState(

@@ -28,7 +28,12 @@ data class StationUi(
     val windMs: Float?,
     val windGustMs: Float?,
     val windDirDeg: Int?,
-    val rainMm: Float?,
+    /**
+     * DAILY precipitation total for BOTH stations (M1.6b-2 unification,
+     * Pavel 22. 9.) — labeled "úhrn za den". The per-source raw semantics
+     * (INFOPOCASI daily / CHMU 10-min) stay in the DB ([rainMm] history).
+     */
+    val rainDailyMm: Float?,
     val rainLabel: String,
     /** Measurement time from the source; null = the station has no data. */
     val measuredAtMs: Long?,
@@ -43,11 +48,8 @@ data class StationUi(
             else -> station
         }
 
-        fun rainLabelFor(station: String): String = when (station) {
-            Sources.STATION_INFOPOCASI -> "úhrn za den"
-            Sources.STATION_CHMU -> "úhrn za 10 min"
-            else -> "—"
-        }
+        /** Unified since M1.6b-2: both sources show the daily total. */
+        fun rainLabelFor(station: String): String = "úhrn za den"
     }
 }
 
@@ -90,7 +92,7 @@ object MainUiStateMapper {
         windMs = m.windMs,
         windGustMs = m.windGustMs,
         windDirDeg = m.windDirDeg,
-        rainMm = m.rainMm,
+        rainDailyMm = m.rainDailyMm,
         rainLabel = StationUi.rainLabelFor(m.station),
         measuredAtMs = m.measuredAtMs,
         isStale = nowMs - m.measuredAtMs > STALE_MS,
@@ -107,7 +109,7 @@ object MainUiStateMapper {
         windMs = null,
         windGustMs = null,
         windDirDeg = null,
-        rainMm = null,
+        rainDailyMm = null,
         rainLabel = StationUi.rainLabelFor(station),
         measuredAtMs = null,
         isStale = false,

@@ -39,7 +39,9 @@ object AppModule {
     @Provides
     @Singleton
     fun appDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.NAME).build()
+        Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.NAME)
+            .addMigrations(AppDatabase.MIGRATION_1_2) // v2: + rainDailyMm
+            .build()
 
     @Provides
     fun measurementDao(db: AppDatabase): MeasurementDao = db.measurementDao()

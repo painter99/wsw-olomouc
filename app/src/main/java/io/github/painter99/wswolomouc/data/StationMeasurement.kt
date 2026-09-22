@@ -1,18 +1,15 @@
 package io.github.painter99.wswolomouc.data
 
 import io.github.painter99.wswolomouc.Sources
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 /**
  * Unified measurement from one station, independent of the wire format (M1.4).
  *
  * Units follow the PRD data model: wind in m/s, pressure in hPa, rain in mm.
- * Rain semantics differ per source and MUST be surfaced in the UI:
- *  - INFOPOCASI: daily total (clientraw field [10])
+ * Rain semantics (M1.6b-2 unification, Pavel 22. 9.): the UI shows the
+ * DAILY total for BOTH stations ([rainDailyMm], label "úhrn za den").
+ * [rainMm] keeps the raw per-source value for the DB/history:
+ *  - INFOPOCASI: daily total (customclientraw `rfall`)
  *  - CHMU_HOLICE: accumulation of the last 10 minutes (element SRA10M)
  *
  * Pressure is present only for INFOPOCASI — the CHMU 10M feed has no P
@@ -26,9 +23,17 @@ data class StationMeasurement(
     val windMs: Float?,
     val windGustMs: Float?,
     val windDirDeg: Int?,
+    /** Raw source value: INFOPOCASI daily total / CHMU last 10 min (DB, history). */
     val rainMm: Float?,
     val measuredAtMs: Long,       // measurement time from the source (epoch ms UTC)
-    val fetchedAtMs: Long         // fetch time (epoch ms UTC)
+    val fetchedAtMs: Long,        // fetch time (epoch ms UTC)
+    /**
+     * DAILY precipitation total for BOTH sources (M1.6b-2 unification,
+     * Pavel 22. 9.): INFOPOCASI = rfall; CHMU = sum of all SRA10M rows of
+     * the day from the daily 10M file. The UI displays THIS value with the
+     * label "úhrn za den" for both stations; [rainMm] stays raw for history.
+     */
+    val rainDailyMm: Float? = null
 )
 
 /**
@@ -36,20 +41,17 @@ data class StationMeasurement(
  */
 object StationMeasurementMapper {
 
-    /** Station local timezone — both Olomouc sources report local wall time. */
-    private val PRAGUE: ZoneId = ZoneId.of("Europe/Prague")
-
     private const val KMH_PER_MS = 3.6f
 
     /**
-     * Maps a parsed clientraw.txt measurement. Wind arrives in km/h
-     * (clientraw [12]/[14], unit not yet cross-checked against the station
-     * website) and is converted to m/s. The measurement time is parsed from
-     * station-local date [74] + time [32]; if unparseable, the fetch time is
-     * used as a conservative fallback.
+     * Maps a parsed infopocasi customclientraw.txt measurement (M1.6b-2 data
+     * fix). Wind arrives in km/h (labeled `wspeed`/`wgust`, unit guarded by
+     * the parser) and is converted to m/s. Rain is the DAILY total (`rfall`).
+     * If the source time is unparseable, the fetch time is used as a
+     * conservative fallback.
      */
-    fun fromClientraw(
-        m: ClientrawMeasurement,
+    fun fromCustomClientraw(
+        m: CustomClientrawMeasurement,
         stationId: String = Sources.STATION_INFOPOCASI,
         fetchedAtMs: Long
     ): StationMeasurement = StationMeasurement(
@@ -61,7 +63,8 @@ object StationMeasurementMapper {
         windGustMs = m.windGustKmh?.div(KMH_PER_MS),
         windDirDeg = m.windDirDeg,
         rainMm = m.rainTodayMm,
-        measuredAtMs = clientrawMeasuredAtMs(m.measuredDate, m.measuredTime) ?: fetchedAtMs,
+        rainDailyMm = m.rainTodayMm, // rfall IS the daily total
+        measuredAtMs = m.measuredAtEpochMs ?: fetchedAtMs,
         fetchedAtMs = fetchedAtMs
     )
 
@@ -78,22 +81,8 @@ object StationMeasurementMapper {
         windGustMs = m.windGustMs,
         windDirDeg = m.windDirDeg,
         rainMm = m.rain10mMm,
+        rainDailyMm = m.rainDailyMm, // exact sum of the day's SRA10M rows
         measuredAtMs = m.measuredAtEpochMs,
         fetchedAtMs = fetchedAtMs
     )
-
-    /**
-     * Combines clientraw date ("19/9/2026") and time ("10:08:27") into an
-     * epoch-ms instant in Europe/Prague. Returns null on malformed input.
-     */
-    fun clientrawMeasuredAtMs(date: String?, time: String?): Long? {
-        if (date.isNullOrBlank() || time.isNullOrBlank()) return null
-        return try {
-            val d = LocalDate.parse(date, DateTimeFormatter.ofPattern("d/M/u"))
-            val t = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm:ss"))
-            LocalDateTime.of(d, t).atZone(PRAGUE).toInstant().toEpochMilli()
-        } catch (e: Exception) {
-            null
-        }
-    }
 }

@@ -3,23 +3,27 @@ package io.github.painter99.wswolomouc.widget
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.LocalSize
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
-import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
+import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -34,27 +38,40 @@ import io.github.painter99.wswolomouc.ui.Format
 import io.github.painter99.wswolomouc.ui.RelativeTimeFormatter
 
 /**
- * Home-screen widget 4×2 (M1.6a, PRD F2.1/F2.2/F2.4 + synthesis F2.5).
+ * Home-screen widget 4×2/5×2 (M1.6a + M1.6b-2 v2, PRD F2.1/F2.2/F2.4/F2.6).
  *
- * M1.6a scope: cache-first (no network fetch from the widget — F1.5 rate
- * limit and periodic sync arrive with M1.7 WorkManager). The widget is
- * refreshed when the app itself refreshes (MainActivity hook) and on system
- * update requests. Background is AMOLED black per F2.6 default; typography
- * per NF8 (temperature 44sp, secondary row >= 14sp).
+ * Cache-first (no network fetch from the widget — periodic sync lives in
+ * M1.7 WorkManager, so data are at most ~15 min old when infopocasi works).
+ *
+ * Layout v2 (Pavel 22. 9.):
+ *  - LEFT = synthesis value (F2.5 fallback — always some value) + secondary
+ *    row (feels-like / wind / rain, precise temperatures) + age.
+ *  - RIGHT = BOTH stations, each with its own last-measurement time.
+ *  - ALL text pure white (no gray on black — sunlight legibility); only the
+ *    status dots are colored.
+ *  - 5×2 wide mode adds per-station humidity (SizeMode.Responsive; sizes far
+ *    apart so 4×2 stays compact).
  */
 class WswWidget : GlanceAppWidget() {
+
+    // Compact 4×2 and wide 5×2 (F2.6). The two defined sizes are far apart
+    // so the "closest size" selection keeps 4×2 compact and 5×2 wide.
+    override val sizeMode: SizeMode = SizeMode.Responsive(
+        setOf(DpSize(240.dp, 110.dp), DpSize(400.dp, 110.dp))
+    )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val repository = EntryPointAccessors
             .fromApplication(context.applicationContext, WidgetEntryPoint::class.java)
             .weatherRepository()
 
-        // Cache-first read only — no network from the widget in M1.6a.
+        // Cache-first read only — no network from the widget (M1.6a).
         val snapshot = repository.latestFromCache()
-        val state = WidgetSynthesis.synthesize(snapshot, System.currentTimeMillis())
 
         provideContent {
-            WidgetContent(state, nowMs = System.currentTimeMillis())
+            val wide = LocalSize.current.width >= 400.dp
+            val layout = WidgetLayout.build(snapshot, System.currentTimeMillis(), wide)
+            WidgetContent(layout, nowMs = System.currentTimeMillis())
         }
     }
 }
@@ -71,51 +88,96 @@ class WswWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = WswWidget()
 }
 
-private val DotGreen = Color(0xFF2E7D32)
-private val DotOrange = Color(0xFFEF6C00)
-private val DotGray = Color(0xFF9E9E9E)
+private fun dotColor(hasData: Boolean, isStale: Boolean): Long = when {
+    hasData && !isStale -> WidgetPalette.DOT_OK
+    isStale -> WidgetPalette.DOT_STALE
+    else -> WidgetPalette.DOT_OFFLINE
+}
+
+private fun textStyle(size: Int, bold: Boolean = false) = TextStyle(
+    color = ColorProvider(Color(WidgetPalette.TEXT_PRIMARY)),
+    fontSize = size.sp,
+    fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal
+)
+
+private fun dotStyle(color: Long) = TextStyle(
+    color = ColorProvider(Color(color)),
+    fontSize = 12.sp
+)
+
+private fun ageText(measuredAtMs: Long?, nowMs: Long): String =
+    measuredAtMs?.let { "před " + RelativeTimeFormatter.format(it, nowMs).removePrefix("před ") }
+        ?: "bez dat"
 
 @Composable
-fun WidgetContent(state: WidgetState, nowMs: Long) {
-    val dotColor = when (state.status) {
-        WidgetStatus.OK -> DotGreen
-        WidgetStatus.STALE -> DotOrange
-        WidgetStatus.OFFLINE -> DotGray
-    }
-
-    Box(
+fun WidgetContent(layout: WidgetLayoutState, nowMs: Long) {
+    Row(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(ColorProvider(Color.Black))
-            .padding(12.dp)
+            .padding(10.dp)
             .clickable(actionStartActivity<MainActivity>()),
-        contentAlignment = Alignment.CenterStart
+        horizontalAlignment = Alignment.Start,
+        verticalAlignment = Alignment.Top
     ) {
-        Column {
+        // LEFT half: synthesis + secondary quantities (one per line) + age.
+        Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
                 text = "●",
-                style = TextStyle(color = ColorProvider(dotColor), fontSize = 14.sp)
+                style = dotStyle(dotColor(layout.left.temperatureC != null, layout.left.status == WidgetStatus.STALE))
             )
-            Spacer(modifier = GlanceModifier.height(4.dp))
+            Spacer(modifier = GlanceModifier.height(2.dp))
             Text(
-                text = Format.temperature(state.temperatureC),
-                style = TextStyle(
-                    color = ColorProvider(Color.White),
-                    fontSize = 44.sp,
-                    fontWeight = FontWeight.Bold
+                text = Format.temperaturePrecise(layout.left.temperatureC),
+                style = textStyle(40, bold = true)
+            )
+            Text(
+                text = layout.left.badge,
+                style = textStyle(14)
+            )
+            for (item in layout.secondary) {
+                Text(
+                    text = "${item.label} ${item.text}",
+                    style = textStyle(14)
                 )
-            )
-            Spacer(modifier = GlanceModifier.height(4.dp))
+            }
             Text(
-                text = state.badge,
-                style = TextStyle(color = ColorProvider(Color(0xFFBDBDBD)), fontSize = 14.sp)
-            )
-            Text(
-                text = state.measuredAtMs?.let {
+                text = layout.left.measuredAtMs?.let {
                     "Měření " + RelativeTimeFormatter.format(it, nowMs)
                 } ?: "Bez dat",
-                style = TextStyle(color = ColorProvider(Color(0xFFBDBDBD)), fontSize = 14.sp)
+                style = textStyle(14)
             )
+        }
+        Spacer(modifier = GlanceModifier.width(10.dp))
+        // RIGHT half: BOTH stations, each with its own measurement age.
+        Column(horizontalAlignment = Alignment.End) {
+            for ((index, station) in layout.stations.withIndex()) {
+                if (index > 0) Spacer(modifier = GlanceModifier.height(8.dp))
+                Row {
+                    Text(
+                        text = "●",
+                        style = dotStyle(dotColor(station.hasData, station.isStale))
+                    )
+                    Text(
+                        text = " " + station.name,
+                        style = textStyle(14)
+                    )
+                }
+                Text(
+                    text = Format.temperaturePrecise(station.temperatureC),
+                    style = textStyle(20, bold = true)
+                )
+                Text(
+                    text = ageText(station.measuredAtMs, nowMs),
+                    style = textStyle(14)
+                )
+                if (layout.showStationHumidity && station.humidityPct != null) {
+                    Text(
+                        text = Format.humidity(station.humidityPct),
+                        style = textStyle(14)
+                    )
+                }
+            }
         }
     }
 }

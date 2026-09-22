@@ -11,6 +11,13 @@ object Format {
 
     fun temperature(c: Float?): String = if (c == null) "—" else "${c.roundToInt()} °C"
 
+    /**
+     * One decimal, Czech comma (Pavel 22. 9.: "teplota na desetiny") —
+     * used by the widget; the main screen keeps [temperature].
+     */
+    fun temperaturePrecise(c: Float?): String =
+        if (c == null) "—" else String.format(Locale("cs"), "%.1f", c) + " °C"
+
     fun humidity(pct: Int?): String = if (pct == null) "—" else "$pct %"
 
     fun pressure(hPa: Float?): String = if (hPa == null) "—" else "${hPa.roundToInt()} hPa"

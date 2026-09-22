@@ -5,7 +5,14 @@ package io.github.painter99.wswolomouc
  * Live-verified 2026-09-19.
  */
 object Sources {
-    const val INFOPOCASI_URL = "https://infopocasi-olomouc.cz/clientraw.txt"
+    /**
+     * Infopocasi customclientraw.txt — LABELED WeatherDisplay JSON with
+     * declared units (M1.6b-2 data fix, 22. 9. 2026). The old clientraw.txt
+     * field indices turned out to be non-standard on this station
+     * (clientraw[1] = 7.3 while the real temperature was 13.6 °C,
+     * cross-checked against CHMU; clientraw[12] = indoor temp).
+     */
+    const val INFOPOCASI_URL = "https://infopocasi-olomouc.cz/customclientraw.txt"
 
     const val CHMU_BASE = "https://opendata.chmi.cz/meteorology/climate/now/data/"
     const val CHMU_STATION_CODE = "0-203-0-11742" // Olomouc, Holice (GH_ID O2OLOM01)

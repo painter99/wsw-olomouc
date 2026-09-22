@@ -1,19 +1,19 @@
 package io.github.painter99.wswolomouc.widget
 
 /**
- * Widget color palette (M1.6b-2) — pure ARGB constants so contrast is
- * unit-testable (WidgetPaletteTest). Background is AMOLED black (F2.6);
- * per Pavel's rule (22. 9.) every text and icon must be clearly visible
- * on black: text colors >= 7:1, status dots >= 4.5:1 (WCAG vs #000000).
+ * Widget color palette v2 (M1.6b-2 redesign, Pavel 22. 9.: "nechci šedé
+ * písmo ve widgetu, nejde vidět například na slunci").
  *
- * DOT_OK is lightened (#66BB6A, 8.9:1) compared to the app's dark green
- * (#2E7D32, 4.1:1) — the app uses a light background and keeps the dark
- * variant there.
+ * Rules:
+ *  - ALL widget text is pure white (21:1 vs the AMOLED black background,
+ *    F2.6); gray text colors are banned. Emphasis comes from size/weight
+ *    only, never from darker color.
+ *  - Status dots keep their colors and reach >= 4.5:1 vs black (WCAG).
+ *    DOT_OK is lightened (#66BB6A, 8.9:1) — the app's dark green (#2E7D32,
+ *    4.1:1) stays on the app's light background only.
  */
 object WidgetPalette {
     const val TEXT_PRIMARY: Long = 0xFFFFFFFFL   // 21.0:1
-    const val TEXT_SECONDARY: Long = 0xFFBDBDBDL // 11.2:1
-    const val TEXT_TERTIARY: Long = 0xFF9E9E9EL  // 7.8:1
     const val DOT_OK: Long = 0xFF66BB6AL         // 8.9:1
     const val DOT_STALE: Long = 0xFFEF6C00L      // 6.8:1
     const val DOT_OFFLINE: Long = 0xFF9E9E9EL    // 7.8:1

@@ -17,7 +17,6 @@ import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
-import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
@@ -39,16 +38,19 @@ import io.github.painter99.wswolomouc.ui.Format
 import io.github.painter99.wswolomouc.ui.RelativeTimeFormatter
 
 /**
- * Home-screen widget 4×2/5×2 (M1.6a + M1.6b-2, PRD F2.1/F2.2/F2.4/F2.6).
+ * Home-screen widget 4×2/5×2 (M1.6a + M1.6b-2 v2, PRD F2.1/F2.2/F2.4/F2.6).
  *
- * Cache-first (no network fetch from the widget — F1.5 rate limit and
- * periodic sync live in M1.7 WorkManager). Layout fills the whole cell area:
- * LEFT half = synthesis (F2.5) + secondary row (feels-like / wind / rain,
- * max 3 items, NF8) + data age; RIGHT half = the other station, compact.
- * 5×2 wide mode additionally shows the right station's humidity
- * (SizeMode.Responsive; sizes chosen far apart so 4×2 stays compact).
- * Background AMOLED black (F2.6); palette per M1.6b-2 contrast rule — every
- * text >= 7:1 vs black, dots >= 4.5:1 (WidgetPaletteTest).
+ * Cache-first (no network fetch from the widget — periodic sync lives in
+ * M1.7 WorkManager, so data are at most ~15 min old when infopocasi works).
+ *
+ * Layout v2 (Pavel 22. 9.):
+ *  - LEFT = synthesis value (F2.5 fallback — always some value) + secondary
+ *    row (feels-like / wind / rain, precise temperatures) + age.
+ *  - RIGHT = BOTH stations, each with its own last-measurement time.
+ *  - ALL text pure white (no gray on black — sunlight legibility); only the
+ *    status dots are colored.
+ *  - 5×2 wide mode adds per-station humidity (SizeMode.Responsive; sizes far
+ *    apart so 4×2 stays compact).
  */
 class WswWidget : GlanceAppWidget() {
 
@@ -86,17 +88,26 @@ class WswWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = WswWidget()
 }
 
-private fun dotColor(status: WidgetStatus): Long = when (status) {
-    WidgetStatus.OK -> WidgetPalette.DOT_OK
-    WidgetStatus.STALE -> WidgetPalette.DOT_STALE
-    WidgetStatus.OFFLINE -> WidgetPalette.DOT_OFFLINE
+private fun dotColor(hasData: Boolean, isStale: Boolean): Long = when {
+    hasData && !isStale -> WidgetPalette.DOT_OK
+    isStale -> WidgetPalette.DOT_STALE
+    else -> WidgetPalette.DOT_OFFLINE
 }
 
-private fun textStyle(argb: Long, size: Int, bold: Boolean = false) = TextStyle(
-    color = ColorProvider(Color(argb)),
+private fun textStyle(size: Int, bold: Boolean = false) = TextStyle(
+    color = ColorProvider(Color(WidgetPalette.TEXT_PRIMARY)),
     fontSize = size.sp,
     fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal
 )
+
+private fun dotStyle(color: Long) = TextStyle(
+    color = ColorProvider(Color(color)),
+    fontSize = 12.sp
+)
+
+private fun ageText(measuredAtMs: Long?, nowMs: Long): String =
+    measuredAtMs?.let { "před " + RelativeTimeFormatter.format(it, nowMs).removePrefix("před ") }
+        ?: "bez dat"
 
 @Composable
 fun WidgetContent(layout: WidgetLayoutState, nowMs: Long) {
@@ -104,7 +115,7 @@ fun WidgetContent(layout: WidgetLayoutState, nowMs: Long) {
         modifier = GlanceModifier
             .fillMaxSize()
             .background(ColorProvider(Color.Black))
-            .padding(12.dp),
+            .padding(10.dp),
         horizontalAlignment = Alignment.Start,
         verticalAlignment = Alignment.Top
     ) {
@@ -112,67 +123,60 @@ fun WidgetContent(layout: WidgetLayoutState, nowMs: Long) {
         Column(modifier = GlanceModifier.defaultWeight()) {
             Text(
                 text = "●",
-                style = textStyle(dotColor(layout.left.status), 14, bold = false)
+                style = dotStyle(dotColor(layout.left.temperatureC != null, layout.left.status == WidgetStatus.STALE))
             )
-            Spacer(modifier = GlanceModifier.height(4.dp))
+            Spacer(modifier = GlanceModifier.height(2.dp))
             Text(
-                text = Format.temperature(layout.left.temperatureC),
-                style = textStyle(WidgetPalette.TEXT_PRIMARY, 44, bold = true)
+                text = Format.temperaturePrecise(layout.left.temperatureC),
+                style = textStyle(40, bold = true)
             )
-            Spacer(modifier = GlanceModifier.height(4.dp))
             Text(
                 text = layout.left.badge,
-                style = textStyle(WidgetPalette.TEXT_SECONDARY, 14, bold = false)
+                style = textStyle(14)
             )
             if (layout.secondary.isNotEmpty()) {
                 Text(
                     text = layout.secondary.joinToString(" · ") { "${it.label} ${it.text}" },
-                    style = textStyle(WidgetPalette.TEXT_TERTIARY, 14, bold = false)
+                    style = textStyle(14)
                 )
             }
-            Spacer(modifier = GlanceModifier.height(4.dp))
             Text(
                 text = layout.left.measuredAtMs?.let {
                     "Měření " + RelativeTimeFormatter.format(it, nowMs)
                 } ?: "Bez dat",
-                style = textStyle(WidgetPalette.TEXT_SECONDARY, 14, bold = false)
+                style = textStyle(14)
             )
         }
-        Spacer(modifier = GlanceModifier.width(12.dp))
-        // RIGHT half: the other station, compact (Pavel's proposal d, 21. 9.).
+        Spacer(modifier = GlanceModifier.width(10.dp))
+        // RIGHT half: BOTH stations, each with its own measurement age.
         Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = "●",
-                style = textStyle(
-                    when {
-                        layout.right.hasData && !layout.right.isStale -> WidgetPalette.DOT_OK
-                        layout.right.isStale -> WidgetPalette.DOT_STALE
-                        else -> WidgetPalette.DOT_OFFLINE
-                    },
-                    14, bold = false
-                )
-            )
-            Spacer(modifier = GlanceModifier.height(2.dp))
-            Text(
-                text = layout.right.name,
-                style = textStyle(WidgetPalette.TEXT_SECONDARY, 14, bold = false)
-            )
-            Text(
-                text = Format.temperature(layout.right.temperatureC),
-                style = textStyle(WidgetPalette.TEXT_PRIMARY, 24, bold = true)
-            )
-            if (layout.showRightHumidity && layout.right.humidityPct != null) {
+            for ((index, station) in layout.stations.withIndex()) {
+                if (index > 0) Spacer(modifier = GlanceModifier.height(8.dp))
+                Row {
+                    Text(
+                        text = "●",
+                        style = dotStyle(dotColor(station.hasData, station.isStale))
+                    )
+                    Text(
+                        text = " " + station.name,
+                        style = textStyle(14)
+                    )
+                }
                 Text(
-                    text = Format.humidity(layout.right.humidityPct),
-                    style = textStyle(WidgetPalette.TEXT_TERTIARY, 14, bold = false)
+                    text = Format.temperaturePrecise(station.temperatureC),
+                    style = textStyle(20, bold = true)
                 )
+                Text(
+                    text = ageText(station.measuredAtMs, nowMs),
+                    style = textStyle(14)
+                )
+                if (layout.showStationHumidity && station.humidityPct != null) {
+                    Text(
+                        text = Format.humidity(station.humidityPct),
+                        style = textStyle(14)
+                    )
+                }
             }
-            Text(
-                text = layout.right.measuredAtMs?.let {
-                    "Měření " + RelativeTimeFormatter.format(it, nowMs)
-                } ?: "Bez dat",
-                style = textStyle(WidgetPalette.TEXT_TERTIARY, 14, bold = false)
-            )
         }
     }
 }

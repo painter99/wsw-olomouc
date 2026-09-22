@@ -1,4 +1,4 @@
-# CI run 49 — commit 9878761 — m16b2-widget-layout
+# CI run 50 — commit bf6d766 — m16b2-widget-layout
 
 ===== build_output.txt =====
 Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
@@ -35,13 +35,8 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:processDebugResources
 > Task :app:kspDebugKotlin
 
-> Task :app:compileDebugKotlin
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/CustomClientrawParser.kt:78:37 None of the following candidates is applicable:
-static fun of(p0: Int, p1: Month!, p2: Int, p3: Int, p4: Int, p5: Int): LocalDateTime!
-static fun of(p0: Int, p1: Int, p2: Int, p3: Int, p4: Int, p5: Int): LocalDateTime!
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/CustomClientrawParser.kt:80:15 Unresolved reference 'toInstant'.
-
 > Task :app:compileDebugKotlin FAILED
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/data/CustomClientrawParser.kt:77:36 Destructuring of type 'kotlin.collections.List<kotlin.Int>' requires operator function 'component6()'.
 
 FAILURE: Build failed with an exception.
 
@@ -245,6 +240,6 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 1m 40s
+BUILD FAILED in 1m 34s
 17 actionable tasks: 17 executed
 

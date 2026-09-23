@@ -1,4 +1,4 @@
-# CI run 88 — commit cce3551 — main
+# CI run 89 — commit 51a1573 — m17-trend
 
 ===== build_output.txt =====
 Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
@@ -22,10 +22,10 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:mapDebugSourceSetPaths
 > Task :app:generateDebugResources
 > Task :app:packageDebugResources
+> Task :app:mergeDebugResources
 > Task :app:createDebugCompatibleScreenManifests
 > Task :app:extractDeepLinksDebug
 > Task :app:parseDebugLocalResources
-> Task :app:mergeDebugResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
@@ -56,10 +56,35 @@ w: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/
 
 > Task :app:testDebugUnitTest
 
-MainViewModelTest > refresh_rateLimited_messageShowsDataAgeAndRemaining FAILED
-    java.lang.NullPointerException at MainViewModelTest.kt:188
+MainViewModelTest > sourcesFail_withStaleCache_offlineStillServesLatestValues FAILED
+    kotlinx.coroutines.TimeoutCancellationException at CoroutineDebugging.kt:42
+        Caused by: kotlinx.coroutines.TimeoutCancellationException at Timeout.kt:188
 
-140 tests completed, 1 failed
+MainViewModelTest > refresh_withinRateLimit_showsRateLimitMessage FAILED
+    kotlinx.coroutines.TimeoutCancellationException at CoroutineDebugging.kt:42
+        Caused by: kotlinx.coroutines.TimeoutCancellationException at Timeout.kt:188
+
+MainViewModelTest > trends_windowsWithoutHistory_areHidden FAILED
+    kotlinx.coroutines.TimeoutCancellationException at CoroutineDebugging.kt:42
+        Caused by: kotlinx.coroutines.TimeoutCancellationException at Timeout.kt:188
+
+MainViewModelTest > sourcesFail_noCache_bothStationsArePlaceholders FAILED
+    kotlinx.coroutines.TimeoutCancellationException at CoroutineDebugging.kt:42
+        Caused by: kotlinx.coroutines.TimeoutCancellationException at Timeout.kt:188
+
+MainViewModelTest > refresh_completes_isRefreshingFalse FAILED
+    kotlinx.coroutines.TimeoutCancellationException at CoroutineDebugging.kt:42
+        Caused by: kotlinx.coroutines.TimeoutCancellationException at Timeout.kt:188
+
+MainViewModelTest > bothSourcesOk_primaryInfopocasi_secondaryChmu FAILED
+    kotlinx.coroutines.TimeoutCancellationException at CoroutineDebugging.kt:42
+        Caused by: kotlinx.coroutines.TimeoutCancellationException at Timeout.kt:188
+
+MainViewModelTest > trends_computedForPrimary_fromRoomHistory FAILED
+    kotlinx.coroutines.TimeoutCancellationException at CoroutineDebugging.kt:42
+        Caused by: kotlinx.coroutines.TimeoutCancellationException at Timeout.kt:188
+
+140 tests completed, 7 failed
 
 > Task :app:testDebugUnitTest FAILED
 
@@ -233,26 +258,32 @@ Caused by: org.gradle.api.internal.exceptions.MarkedVerificationException: There
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
 
 
-BUILD FAILED in 2m 24s
+BUILD FAILED in 2m 43s
 30 actionable tasks: 30 executed
 
 ===== junit summary =====
-<testsuite name="io.github.painter99.wswolomouc.SourcesTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:16" hostname="runnervmlun5p" time="0.059">
-<testsuite name="io.github.painter99.wswolomouc.data.ChmuDataSourceTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:16" hostname="runnervmlun5p" time="0.542">
-<testsuite name="io.github.painter99.wswolomouc.data.ChmuJsonParserTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:16" hostname="runnervmlun5p" time="0.016">
-<testsuite name="io.github.painter99.wswolomouc.data.CustomClientrawParserTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:16" hostname="runnervmlun5p" time="0.013">
-<testsuite name="io.github.painter99.wswolomouc.data.InfopocasiDataSourceTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:16" hostname="runnervmlun5p" time="0.058">
-<testsuite name="io.github.painter99.wswolomouc.data.StationMeasurementMapperTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:16" hostname="runnervmlun5p" time="0.002">
-<testsuite name="io.github.painter99.wswolomouc.data.WeatherRepositoryTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:16" hostname="runnervmlun5p" time="0.043">
-<testsuite name="io.github.painter99.wswolomouc.sync.SyncScheduleTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:17" hostname="runnervmlun5p" time="0.002">
-<testsuite name="io.github.painter99.wswolomouc.ui.FeelsLikeTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:17" hostname="runnervmlun5p" time="0.002">
-<testsuite name="io.github.painter99.wswolomouc.ui.FormatTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:17" hostname="runnervmlun5p" time="0.037">
-<testsuite name="io.github.painter99.wswolomouc.ui.MainUiStateMapperTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:17" hostname="runnervmlun5p" time="0.005">
-<testsuite name="io.github.painter99.wswolomouc.ui.MainViewModelTest" tests="11" skipped="0" failures="1" errors="0" timestamp="2026-09-23T19:27:17" hostname="runnervmlun5p" time="0.137">
-    <failure message="java.lang.NullPointerException" type="java.lang.NullPointerException">java.lang.NullPointerException
-<testsuite name="io.github.painter99.wswolomouc.ui.RelativeTimeFormatterTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:17" hostname="runnervmlun5p" time="0.009">
-<testsuite name="io.github.painter99.wswolomouc.ui.ThemeModeTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:17" hostname="runnervmlun5p" time="0.0">
-<testsuite name="io.github.painter99.wswolomouc.ui.TrendTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:17" hostname="runnervmlun5p" time="0.005">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetLayoutTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:17" hostname="runnervmlun5p" time="0.013">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetPaletteTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:17" hostname="runnervmlun5p" time="0.008">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetSynthesisTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:27:17" hostname="runnervmlun5p" time="0.002">
+<testsuite name="io.github.painter99.wswolomouc.SourcesTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="0.054">
+<testsuite name="io.github.painter99.wswolomouc.data.ChmuDataSourceTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="0.526">
+<testsuite name="io.github.painter99.wswolomouc.data.ChmuJsonParserTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="0.019">
+<testsuite name="io.github.painter99.wswolomouc.data.CustomClientrawParserTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="0.012">
+<testsuite name="io.github.painter99.wswolomouc.data.InfopocasiDataSourceTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="0.057">
+<testsuite name="io.github.painter99.wswolomouc.data.StationMeasurementMapperTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="0.001">
+<testsuite name="io.github.painter99.wswolomouc.data.WeatherRepositoryTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="0.047">
+<testsuite name="io.github.painter99.wswolomouc.sync.SyncScheduleTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="0.002">
+<testsuite name="io.github.painter99.wswolomouc.ui.FeelsLikeTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="0.001">
+<testsuite name="io.github.painter99.wswolomouc.ui.FormatTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="0.032">
+<testsuite name="io.github.painter99.wswolomouc.ui.MainUiStateMapperTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="0.005">
+<testsuite name="io.github.painter99.wswolomouc.ui.MainViewModelTest" tests="11" skipped="0" failures="7" errors="0" timestamp="2026-09-23T19:45:18" hostname="runnervmlun5p" time="35.086">
+    <failure message="kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms" type="kotlinx.coroutines.TimeoutCancellationException">kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms
+    <failure message="kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms" type="kotlinx.coroutines.TimeoutCancellationException">kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms
+    <failure message="kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms" type="kotlinx.coroutines.TimeoutCancellationException">kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms
+    <failure message="kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms" type="kotlinx.coroutines.TimeoutCancellationException">kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms
+    <failure message="kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms" type="kotlinx.coroutines.TimeoutCancellationException">kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms
+    <failure message="kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms" type="kotlinx.coroutines.TimeoutCancellationException">kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms
+    <failure message="kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms" type="kotlinx.coroutines.TimeoutCancellationException">kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 5000 ms
+<testsuite name="io.github.painter99.wswolomouc.ui.RelativeTimeFormatterTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:54" hostname="runnervmlun5p" time="0.006">
+<testsuite name="io.github.painter99.wswolomouc.ui.ThemeModeTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:54" hostname="runnervmlun5p" time="0.0">
+<testsuite name="io.github.painter99.wswolomouc.ui.TrendTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:54" hostname="runnervmlun5p" time="0.003">
+<testsuite name="io.github.painter99.wswolomouc.widget.WidgetLayoutTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:54" hostname="runnervmlun5p" time="0.011">
+<testsuite name="io.github.painter99.wswolomouc.widget.WidgetPaletteTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:54" hostname="runnervmlun5p" time="0.003">
+<testsuite name="io.github.painter99.wswolomouc.widget.WidgetSynthesisTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-09-23T19:45:54" hostname="runnervmlun5p" time="0.001">

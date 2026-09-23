@@ -55,6 +55,7 @@ import io.github.painter99.wswolomouc.ui.MainUiState
 import io.github.painter99.wswolomouc.ui.MainViewModel
 import io.github.painter99.wswolomouc.ui.RelativeTimeFormatter
 import io.github.painter99.wswolomouc.ui.StationUi
+import io.github.painter99.wswolomouc.ui.ThemeMode
 import io.github.painter99.wswolomouc.widget.WswWidget
 import kotlinx.coroutines.delay
 

@@ -2,6 +2,7 @@ package io.github.painter99.wswolomouc.widget
 
 import io.github.painter99.wswolomouc.Sources
 import io.github.painter99.wswolomouc.data.StationMeasurement
+import io.github.painter99.wswolomouc.ui.TrendDirection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

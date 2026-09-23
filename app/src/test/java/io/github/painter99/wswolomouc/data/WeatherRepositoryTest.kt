@@ -25,6 +25,9 @@ class WeatherRepositoryTest {
         override suspend fun insert(m: MeasurementEntity): Long { rows.add(m); return rows.size.toLong() }
         override suspend fun latestForStation(station: String): MeasurementEntity? =
             rows.filter { it.station == station }.maxByOrNull { it.measuredAt }
+        override suspend fun latestBefore(station: String, beforeEpochMs: Long): MeasurementEntity? =
+            rows.filter { it.station == station && it.measuredAt <= beforeEpochMs }
+                .maxByOrNull { it.measuredAt }
         override suspend fun since(fromEpochMs: Long): List<MeasurementEntity> =
             rows.filter { it.measuredAt >= fromEpochMs }.sortedBy { it.measuredAt }
         override suspend fun deleteFetchedBefore(beforeEpochMs: Long): Int {

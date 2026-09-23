@@ -38,7 +38,36 @@ class MainViewModel @Inject constructor(
     }
 
     init {
-        refresh()
+        viewModelScope.launch {
+            // Cache-first (NF3; round 6 ANR fix, Pavel 23. 9.): show the last
+            // known values IMMEDIATELY — the startup spinner must never wait
+            // for the network (10 s timeouts made the app look frozen).
+            val cached = repository.latestFromCache()
+            _uiState.value = if (cached.isNotEmpty()) {
+                val now = clock()
+                val freshness = if (
+                    cached.values.all {
+                        now - it.measuredAtMs <= Sources.STALE_THRESHOLD_MIN * 60_000
+                    }
+                ) {
+                    WeatherRepository.Freshness.FRESH
+                } else {
+                    WeatherRepository.Freshness.STALE
+                }
+                MainUiStateMapper.from(
+                    WeatherRepository.Snapshot(freshness = freshness, measurements = cached),
+                    now
+                )
+            } else {
+                // First launch, nothing cached: placeholders, no spinner.
+                MainUiState(
+                    isLoading = false,
+                    primary = MainUiStateMapper.placeholder(Sources.STATION_INFOPOCASI),
+                    secondary = MainUiStateMapper.placeholder(Sources.STATION_CHMU)
+                )
+            }
+            refresh()
+        }
     }
 
     fun refresh() {

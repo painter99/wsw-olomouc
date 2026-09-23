@@ -116,6 +116,47 @@ object WidgetSynthesis {
         }
     }
 
+    /**
+     * Freshness-weighted average of ALL displayed parameters (round 6, Pavel
+     * 23. 9.): wind, gusts, humidity and daily rain are averaged with the
+     * same w = 1/(age_min + 15) rule as the temperature. Each field is
+     * averaged over the stations that HAVE it; a missing field stays null
+     * (never faked as 0). Pressure is never averaged (only INFOPOCASI has
+     * it). Returns null when the "Ø 2 stanice" rules do not apply.
+     */
+    fun weightedMeasurement(
+        measurements: Map<String, StationMeasurement>,
+        nowMs: Long
+    ): StationMeasurement? {
+        val usable = measurements.values.filter {
+            it.temperatureC != null && nowMs - it.measuredAtMs <= STALE_MS
+        }
+        if (usable.size < 2) return null
+        val weights = usable.map { weight((nowMs - it.measuredAtMs) / 60_000f) }
+
+        fun weightedOf(select: (StationMeasurement) -> Float?): Float? {
+            val valid = usable.zip(weights) { m, w -> select(m)?.let { it to w } }
+                .filterNotNull()
+            if (valid.isEmpty()) return null
+            val wSum = valid.sumOf { it.second.toDouble() }
+            return (valid.sumOf { (v, w) -> v * w.toDouble() } / wSum).toFloat()
+        }
+
+        return StationMeasurement(
+            station = Sources.STATION_INFOPOCASI,
+            temperatureC = weightedOf { it.temperatureC },
+            humidityPct = weightedOf { it.humidityPct?.toFloat() }?.toInt(),
+            pressureHpa = null,
+            windMs = weightedOf { it.windMs },
+            windGustMs = weightedOf { it.windGustMs },
+            windDirDeg = null,
+            rainMm = null,
+            rainDailyMm = weightedOf { it.rainDailyMm },
+            measuredAtMs = usable.minOf { it.measuredAtMs },
+            fetchedAtMs = nowMs
+        )
+    }
+
     /** Short badge names — full names ("Infopocasi Olomouc") do not fit 4×2. */
     fun shortName(station: String): String = when (station) {
         Sources.STATION_INFOPOCASI -> "Infopocasi"

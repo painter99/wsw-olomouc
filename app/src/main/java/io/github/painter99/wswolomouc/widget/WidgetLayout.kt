@@ -45,8 +45,8 @@ data class WidgetLayoutState(
  *
  *  1. Left half is the unchanged F2.5 synthesis; the secondary row takes its
  *     values from the station behind the left badge — with the average badge
- *     ("Ø 2 stanice") non-temperature values come from the PRIMARY station
- *     (F2.5: synthesis applies to temperature only).
+ *     ("Ø 2 stanice") the values are the freshness-weighted averages of BOTH
+ *     stations (round 6, Pavel 23. 9.; F2.5 wording rules still apply).
  *  2. Both station blocks always appear, each with its own last-measurement
  *     time (honest per-source age).
  *  3. Feels-like uses FeelsLike.calculate(T, windMs * 3.6, RH) — wind is
@@ -67,7 +67,14 @@ object WidgetLayout {
     ): WidgetLayoutState {
         val left = WidgetSynthesis.synthesize(measurements, nowMs).copy(trend = trend)
 
-        val source = left.sourceStation?.let { measurements[it] }
+        // Round 6 (Pavel 23. 9.): with the "Ø 2 stanice" badge the secondary
+        // row uses the freshness-weighted average of ALL parameters (wind,
+        // gusts, humidity, rain) — not just the primary station's values.
+        val source = if (left.badge == "Ø 2 stanice") {
+            WidgetSynthesis.weightedMeasurement(measurements, nowMs)
+        } else {
+            left.sourceStation?.let { measurements[it] }
+        }
         val secondary = source?.let { secondaryItems(it) } ?: emptyList()
 
         val stations = listOf(

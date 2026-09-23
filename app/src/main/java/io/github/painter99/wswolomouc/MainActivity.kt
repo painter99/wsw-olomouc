@@ -205,8 +205,9 @@ fun MainContent(
             Text(
                 text = "ČHMÚ Holice slouží k porovnání a jako záloha – ČHMÚ " +
                     "publikuje měření zhruba jednou za hodinu, čerstvější je " +
-                    "Infopocasi. Průměr obou stanic je vážený čerstvostí: " +
-                    "čerstvější měření má větší váhu (váha = 1/(stáří + 15 min)).",
+                    "Infopocasi. Průměr obou stanic (teplota, vítr, poryvy, " +
+                    "srážky i pocitová teplota) je vážený čerstvostí: čerstvější " +
+                    "měření má větší váhu (váha = 1/(stáří + 15 min)).",
                 style = MaterialTheme.typography.bodySmall
             )
         }

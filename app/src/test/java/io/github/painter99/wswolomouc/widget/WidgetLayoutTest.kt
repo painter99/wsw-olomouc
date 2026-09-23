@@ -52,13 +52,14 @@ class WidgetLayoutTest {
     private fun build(
         infopocasi: StationMeasurement?,
         chmu: StationMeasurement?,
-        wide: Boolean = false
+        wide: Boolean = false,
+        trend: TrendDirection? = null
     ): WidgetLayoutState {
         val map = buildMap {
             infopocasi?.let { put(Sources.STATION_INFOPOCASI, it) }
             chmu?.let { put(Sources.STATION_CHMU, it) }
         }
-        return WidgetLayout.build(map, now, wide)
+        return WidgetLayout.build(map, now, wide, trend)
     }
 
     @Test
@@ -188,5 +189,20 @@ class WidgetLayoutTest {
         val chmu = measurement(Sources.STATION_CHMU, 23.0f, 10, humidityPct = 68)
         assertFalse(build(infopocasi, chmu, wide = false).showStationHumidity)
         assertTrue(build(infopocasi, chmu, wide = true).showStationHumidity)
+    }
+
+    /**
+     * M1.7-trend (Pavel 23. 9.): ONE trend arrow (3 h window) next to the big
+     * temperature — carried into the left widget state by the caller (the
+     * widget computes it from Room history, the layout stays pure).
+     */
+    @Test
+    fun trend_isCarriedIntoTheLeftWidgetState() {
+        val s = build(
+            infopocasi = measurement(Sources.STATION_INFOPOCASI, 21.0f, 5),
+            chmu = measurement(Sources.STATION_CHMU, 23.0f, 10),
+            trend = TrendDirection.RISING
+        )
+        assertEquals(TrendDirection.RISING, s.left.trend)
     }
 }

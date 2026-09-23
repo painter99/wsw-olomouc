@@ -73,7 +73,7 @@ class WidgetLayoutTest {
                 Sources.STATION_CHMU, 23.0f, 10, humidityPct = 68, windMs = 4.0f, rainDailyMm = 0.2f
             )
         )
-        assertEquals(22.0f, s.left.temperatureC!!, 0.001f)
+        assertEquals(21.889f, s.left.temperatureC!!, 0.01f) // freshness-weighted (round 3)
         assertEquals("Ø 2 stanice", s.left.badge)
         assertEquals(WidgetStatus.OK, s.left.status)
         assertEquals(Sources.STATION_INFOPOCASI, s.left.sourceStation)

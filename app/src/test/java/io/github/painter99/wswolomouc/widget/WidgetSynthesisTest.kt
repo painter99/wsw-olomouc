@@ -50,16 +50,31 @@ class WidgetSynthesisTest {
     }
 
     @Test
-    fun bothFresh_averagesTemperatureAndBadgesTwoStations() {
+    fun bothFresh_weightedByFreshness_notSimpleMean() {
+        // Round 3 (Pavel 23. 9.): the average is weighted by freshness —
+        // w = 1/(age_min + 15). 21.0 °C @5 min (w=1/20) + 23.0 °C @10 min
+        // (w=1/25) -> 21.889, NOT the plain mean 22.0.
         val s = synthesize(
             infopocasi = measurement(Sources.STATION_INFOPOCASI, 21.0f, 5),
             chmu = measurement(Sources.STATION_CHMU, 23.0f, 10)
         )
-        assertEquals(22.0f, s.temperatureC!!, 0.001f)
+        assertEquals(21.889f, s.temperatureC!!, 0.01f)
         assertEquals("Ø 2 stanice", s.badge)
         assertEquals(WidgetStatus.OK, s.status)
         // Honest age = the OLDER of the two measurements
         assertEquals(now - 10 * minute, s.measuredAtMs)
+    }
+
+    @Test
+    fun weighted_fresherStationHasMoreWeight() {
+        // 14.0 °C @2 min (w=1/17) vs 16.0 °C @28 min (w=1/43) -> 14.565:
+        // the fresher Infopocasi value pulls the result towards itself.
+        val s = synthesize(
+            infopocasi = measurement(Sources.STATION_INFOPOCASI, 14.0f, 2),
+            chmu = measurement(Sources.STATION_CHMU, 16.0f, 28)
+        )
+        assertEquals(14.565f, s.temperatureC!!, 0.01f)
+        assertEquals("Ø 2 stanice", s.badge)
     }
 
     @Test

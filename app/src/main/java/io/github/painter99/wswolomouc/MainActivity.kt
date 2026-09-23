@@ -9,6 +9,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +31,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -65,7 +71,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            // Round 2 (Pavel 23. 9.): system / light / dark, persisted choice.
+            val themeMode by viewModel.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+            val darkTheme = when (themeMode) {
+                ThemeMode.DARK -> true
+                ThemeMode.LIGHT -> false
+                ThemeMode.SYSTEM -> isSystemInDarkTheme()
+            }
+            MaterialTheme(
+                colorScheme = if (darkTheme) darkColorScheme() else lightColorScheme()
+            ) {
                 MainScreen(viewModel)
             }
         }
@@ -76,6 +91,7 @@ class MainActivity : ComponentActivity() {
 fun MainScreen(viewModel: MainViewModel) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val themeMode by viewModel.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     var nowMs by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
     // Re-render every 60 s so "před X min" stays truthful (PRD G2).
@@ -100,12 +116,24 @@ fun MainScreen(viewModel: MainViewModel) {
         // status bar (the status row collided with clock/indicators).
         modifier = Modifier.fillMaxSize().statusBarsPadding()
     ) {
-        MainContent(state = state, nowMs = nowMs, onRefresh = viewModel::refresh)
+        MainContent(
+            state = state,
+            nowMs = nowMs,
+            themeMode = themeMode,
+            onRefresh = viewModel::refresh,
+            onSetTheme = viewModel::setTheme
+        )
     }
 }
 
 @Composable
-fun MainContent(state: MainUiState, nowMs: Long, onRefresh: () -> Unit) {
+fun MainContent(
+    state: MainUiState,
+    nowMs: Long,
+    themeMode: ThemeMode,
+    onRefresh: () -> Unit,
+    onSetTheme: (ThemeMode) -> Unit
+) {
     if (state.isLoading) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -114,7 +142,12 @@ fun MainContent(state: MainUiState, nowMs: Long, onRefresh: () -> Unit) {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        // Round 2 (Pavel 23. 9.): the screen must SCROLL — without it the
+        // bottom rows (sources, licenses) were unreachable.
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         StatusRow(state, nowMs)
@@ -137,6 +170,30 @@ fun MainContent(state: MainUiState, nowMs: Long, onRefresh: () -> Unit) {
         }
         state.rateLimitMessage?.let {
             Text(it, style = MaterialTheme.typography.bodySmall)
+        }
+        // Round 2 (Pavel 23. 9., #8): explain CHMU's role in the app too.
+        Text(
+            text = "ČHMÚ Holice slouží k porovnání a jako záloha – ČHMÚ publikuje " +
+                "měření zhruba jednou za hodinu, čerstvější je Infopocasi.",
+            style = MaterialTheme.typography.bodySmall
+        )
+        // Round 2 (Pavel 23. 9., #5): theme switch, persisted in DataStore.
+        Text(
+            text = "Téma zobrazení",
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            ThemeMode.entries.forEach { mode ->
+                val label = when (mode) {
+                    ThemeMode.SYSTEM -> "Systém"
+                    ThemeMode.LIGHT -> "Světlý"
+                    ThemeMode.DARK -> "Tmavý"
+                }
+                TextButton(onClick = { onSetTheme(mode) }, enabled = mode != themeMode) {
+                    Text(label)
+                }
+            }
         }
         SourceLinks()
     }
@@ -218,7 +275,7 @@ fun StationCard(s: StationUi, nowMs: Long, isPrimary: Boolean) {
             }
 
             Text(
-                text = Format.temperature(s.temperatureC),
+                text = Format.temperaturePrecise(s.temperatureC),
                 fontSize = if (isPrimary) 44.sp else 24.sp,
                 fontWeight = if (isPrimary) FontWeight.Bold else FontWeight.SemiBold
             )
@@ -285,8 +342,13 @@ private fun LinkText(label: String, url: String, context: Context) {
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier
-            .padding(top = 2.dp)
-            .clickable {
+            // Round 2 (#6/#7): spacing between the sources, no ripple box
+            // around the link text.
+            .padding(top = 6.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
                 context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             }
     )

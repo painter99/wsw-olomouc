@@ -9,6 +9,7 @@ import io.github.painter99.wswolomouc.ui.Trend
 import io.github.painter99.wswolomouc.ui.TrendItem
 import javax.inject.Inject
 import kotlin.math.ceil
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,11 +23,19 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: WeatherRepository,
+    private val themeStore: ThemeStore,
     private val clock: () -> Long = System::currentTimeMillis
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainUiState(isLoading = true))
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+
+    /** Persisted theme preference (round 2) — collected in the UI. */
+    val themeMode: Flow<ThemeMode> = themeStore.mode
+
+    fun setTheme(mode: ThemeMode) {
+        viewModelScope.launch { themeStore.set(mode) }
+    }
 
     init {
         refresh()
@@ -70,6 +79,6 @@ class MainViewModel @Inject constructor(
                     repository.pastTemperature(primary.station, nowMs - windowMs)
                 )
             )
-        }
+        }.filter { it.direction != null } // windows without history stay hidden (round 2)
     }
 }

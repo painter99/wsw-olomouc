@@ -113,7 +113,11 @@ object WidgetLayout {
             val feels = FeelsLike.calculate(t, m.windMs?.times(3.6f), m.humidityPct)
             items += SecondaryItem("Pocitová", Format.temperaturePrecise(feels))
         }
-        m.windMs?.let { items += SecondaryItem("Vítr", Format.wind(it)) }
+        m.windMs?.let {
+            // Gust joined into ONE item (round 2, Pavel 23. 9.) — keeps the
+            // row at max 3 items (NF8).
+            items += SecondaryItem("Vítr", Format.windRange(m.windMs, m.windGustMs))
+        }
         // Rain unified to the DAILY total for both sources (Pavel 22. 9.);
         // the CHMU 10-min value stays in the DB history only.
         m.rainDailyMm?.let { items += SecondaryItem("Srážky", Format.rain(it) + " (den)") }

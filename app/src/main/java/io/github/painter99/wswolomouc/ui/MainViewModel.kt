@@ -82,6 +82,10 @@ class MainViewModel @Inject constructor(
     }
 
     fun refresh() {
+        // Single-flight (round 7): a refresh already running wins — the UI
+        // disables the button while refreshing, and a manual tap during the
+        // startup refresh must not race it (flaky NPE, merge run #88).
+        if (_uiState.value.isRefreshing) return
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isRefreshing = true, rateLimitMessage = null)
             val snapshot = repository.refresh()

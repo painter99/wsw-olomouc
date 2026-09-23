@@ -38,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -177,15 +178,24 @@ fun MainContent(
         state.rateLimitMessage?.let {
             Text(it, style = MaterialTheme.typography.bodySmall)
         }
-        // Round 2 (Pavel 23. 9., #8): explain CHMU's role in the app too.
-        // Round 3: disclose the freshness-weighted average formula.
-        Text(
-            text = "ČHMÚ Holice slouží k porovnání a jako záloha – ČHMÚ publikuje " +
-                "měření zhruba jednou za hodinu, čerstvější je Infopocasi. Průměr " +
-                "obou stanic je vážený čerstvostí: čerstvější měření má větší váhu " +
-                "(váha = 1/(stáří + 15 min)).",
-            style = MaterialTheme.typography.bodySmall
-        )
+        // Round 4 (Pavel 23. 9.): the long explanation is collapsed behind a
+        // toggle — the screen stays clean, details on demand.
+        var detailsExpanded by remember { mutableStateOf(false) }
+        TextButton(onClick = { detailsExpanded = !detailsExpanded }) {
+            Text(
+                if (detailsExpanded) "Méně o stanicích a výpočtu"
+                else "Více o stanicích a výpočtu"
+            )
+        }
+        if (detailsExpanded) {
+            Text(
+                text = "ČHMÚ Holice slouží k porovnání a jako záloha – ČHMÚ " +
+                    "publikuje měření zhruba jednou za hodinu, čerstvější je " +
+                    "Infopocasi. Průměr obou stanic je vážený čerstvostí: " +
+                    "čerstvější měření má větší váhu (váha = 1/(stáří + 15 min)).",
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
         // Round 2 (Pavel 23. 9., #5): theme switch, persisted in DataStore.
         Text(
             text = "Téma zobrazení",

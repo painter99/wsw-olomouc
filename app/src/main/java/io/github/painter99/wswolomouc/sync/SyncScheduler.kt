@@ -25,15 +25,15 @@ class SyncScheduler @Inject constructor(
 ) {
 
     fun schedule(spec: SyncSchedule.Spec) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
         val request = PeriodicWorkRequestBuilder<PeriodicSyncWorker>(
             spec.intervalMinutes, TimeUnit.MINUTES,
             spec.flexMinutes, TimeUnit.MINUTES
         )
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
-            )
+            .setConstraints(constraints)
             .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
@@ -41,9 +41,28 @@ class SyncScheduler @Inject constructor(
             ExistingPeriodicWorkPolicy.KEEP,
             request
         )
+
+        // Round 4 (Pavel 23. 9.): a second periodic, phase-offset by 7 min,
+        // halves the effective gap (CHMU caught <= ~10 min after its hourly
+        // publication). The repository rate limit (10 min/source, F1.5)
+        // dedupes actual fetches — no extra load on the operators' servers.
+        val offsetRequest = PeriodicWorkRequestBuilder<PeriodicSyncWorker>(
+            spec.intervalMinutes, TimeUnit.MINUTES,
+            spec.flexMinutes, TimeUnit.MINUTES
+        )
+            .setConstraints(constraints)
+            .setInitialDelay(SyncSchedule.PHASE_OFFSET_MINUTES, TimeUnit.MINUTES)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            UNIQUE_NAME_SECOND,
+            ExistingPeriodicWorkPolicy.KEEP,
+            offsetRequest
+        )
     }
 
     companion object {
         const val UNIQUE_NAME = "wsw-periodic-sync"
+        const val UNIQUE_NAME_SECOND = "wsw-periodic-sync-offset"
     }
 }

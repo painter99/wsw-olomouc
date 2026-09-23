@@ -51,4 +51,15 @@ class SyncScheduleTest {
             assertEquals(true, spec.flexMinutes in 1 until spec.intervalMinutes)
         }
     }
+
+    @Test
+    fun `phase offset for the second worker is 7 minutes`() {
+        // Round 4 (Pavel 23. 9.): WorkManager's periodic minimum is a hard
+        // 15-min floor, so a SECOND 15-min periodic phase-offset by 7 min
+        // halves the effective gap; the repository rate limit (10 min per
+        // source, F1.5) dedupes actual fetches — CHMU is then caught at most
+        // ~10 min after its hourly publication.
+        assertEquals(7L, SyncSchedule.PHASE_OFFSET_MINUTES)
+        assertEquals(true, SyncSchedule.PHASE_OFFSET_MINUTES < SyncSchedule.MIN_INTERVAL_MINUTES)
+    }
 }

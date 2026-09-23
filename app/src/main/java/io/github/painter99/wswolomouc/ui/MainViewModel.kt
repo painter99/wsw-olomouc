@@ -52,7 +52,7 @@ class MainViewModel @Inject constructor(
             val willRefresh = now0 - newestCachedAt >= Sources.FETCH_RATE_LIMIT_MS
             // ONE atomic assignment (isRefreshing included) — otherwise
             // awaiters could observe the cache-first state between it and
-            // refresh() and read a half-final state (CI run #86).
+            // the refresh and read a half-final state (CI run #86).
             _uiState.value = (if (cached.isNotEmpty()) {
                 val freshness = if (
                     cached.values.all {
@@ -76,13 +76,36 @@ class MainViewModel @Inject constructor(
                 )
             }).copy(isRefreshing = willRefresh)
             if (willRefresh) {
-                refresh()
+                refreshInFlight = true
+                viewModelScope.launch {
+                    try {
+                        doRefresh()
+                    } finally {
+                        refreshInFlight = false
+                    }
+                }
             }
         }
     }
 
+    private var refreshInFlight = false
+
+    /** Manual/button refresh — single-flight (round 7, merge run #88). */
     fun refresh() {
+        if (refreshInFlight) return
+        refreshInFlight = true
         viewModelScope.launch {
+            try {
+                doRefresh()
+            } finally {
+                refreshInFlight = false
+            }
+        }
+    }
+
+    /** The refresh body (shared by manual refresh and the startup refresh). */
+    private suspend fun doRefresh() {
+        run {
             _uiState.value = _uiState.value.copy(isRefreshing = true, rateLimitMessage = null)
             val snapshot = repository.refresh()
             val nowMs = clock()

@@ -197,7 +197,8 @@ class MainViewModelTest {
         val vm = MainViewModel(repo, FakeThemeStore(), clock = { now })
         awaitLoaded(vm)      // init: fresh cache -> no network
         vm.refresh()         // manual #1: fetches (data age 4 min)
-        vm.refresh()         // manual #2: rate limited
+        awaitLoaded(vm)      // single-flight: #1 must FINISH before #2
+        vm.refresh()         // manual #2: rate limited (fixed clock)
 
         val state = awaitLoaded(vm)
         val msg = state.rateLimitMessage!!

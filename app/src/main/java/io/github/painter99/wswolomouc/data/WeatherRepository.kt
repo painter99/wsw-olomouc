@@ -63,27 +63,45 @@ class WeatherRepository(
     data class Snapshot(
         val freshness: Freshness,
         /** Latest value per station: network result wins over cache. */
-        val measurements: Map<String, StationMeasurement>
+        val measurements: Map<String, StationMeasurement>,
+        /**
+         * Per-source outcome of the LAST refresh attempt (M1.6b-3).
+         * Sources skipped by the rate limit keep their previous entry.
+         */
+        val sourceResults: Map<String, FetchResult> = emptyMap(),
+        /**
+         * Earliest time the next refresh attempt is allowed (M1.6b-3,
+         * F1.5) — max lastAttempt + rate limit; null = nothing attempted yet.
+         */
+        val nextRefreshAllowedAtMs: Long? = null,
+        /** True when THIS refresh skipped every source due to the rate limit. */
+        val skippedByRateLimit: Boolean = false
     )
 
     private val lastAttemptAt = mutableMapOf<String, Long>()
 
+    /** Last fetch outcome per source (M1.6b-3); rate-limited skips keep it. */
+    private val lastOutcome = mutableMapOf<String, FetchResult>()
+
     suspend fun refresh(): Snapshot = withContext(Dispatchers.IO) {
         val now = clock()
         val fetched = mutableMapOf<String, StationMeasurement>()
+        var attemptedAny = false
 
         for (source in sources) {
             val last = lastAttemptAt[source.id]
             if (last != null && now - last < rateLimitMs) continue // F1.5
             lastAttemptAt[source.id] = now
-            val m = try {
-                source.fetch()
+            attemptedAny = true
+            val outcome = try {
+                source.fetchResult()
             } catch (e: Exception) {
-                null // F1.4: a failing source must never crash the app
+                FetchResult.NetworkError(e.message ?: "exception") // F1.4 defense in depth
             }
-            if (m != null) {
-                dao.insert(m.toEntity())
-                fetched[m.station] = m
+            lastOutcome[source.id] = outcome
+            if (outcome is FetchResult.Success) {
+                dao.insert(outcome.measurement.toEntity())
+                fetched[outcome.measurement.station] = outcome.measurement
             }
         }
 
@@ -95,7 +113,13 @@ class WeatherRepository(
             merged.values.all { isFresh(it, now) } -> Freshness.FRESH
             else -> Freshness.STALE
         }
-        Snapshot(freshness, merged)
+        Snapshot(
+            freshness = freshness,
+            measurements = merged,
+            sourceResults = lastOutcome.toMap(),
+            nextRefreshAllowedAtMs = lastAttemptAt.values.maxOrNull()?.plus(rateLimitMs),
+            skippedByRateLimit = !attemptedAny && lastAttemptAt.isNotEmpty()
+        )
     }
 
     /** Latest persisted value per station (cache-first reads, NF3). */

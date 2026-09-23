@@ -78,4 +78,48 @@ class ChmuDataSourceTest {
         server.enqueue(MockResponse().setBody("<html>oops</html>"))
         assertNull(dataSource().fetch())
     }
+
+    // --- M1.6b-3: detailed fetch outcome -----------------------------------
+
+    @Test
+    fun fetchResult_success_wrapsMeasurement() = runTest {
+        server.enqueue(MockResponse().setBody(fixture()))
+
+        val r = dataSource().fetchResult()
+
+        assertTrue("was $r", r is FetchResult.Success)
+        assertEquals(14.5f, (r as FetchResult.Success).measurement.temperatureC!!, 0.01f)
+    }
+
+    @Test
+    fun fetchResult_http404_reportsHttpErrorWithCode() = runTest {
+        server.enqueue(MockResponse().setResponseCode(404))
+
+        val r = dataSource().fetchResult()
+
+        assertTrue("was $r", r is FetchResult.HttpError)
+        assertEquals(404, (r as FetchResult.HttpError).code)
+    }
+
+    @Test
+    fun fetchResult_malformedJson_reportsParseError() = runTest {
+        server.enqueue(MockResponse().setBody("<html>oops</html>"))
+
+        val r = dataSource().fetchResult()
+
+        assertTrue("was $r", r is FetchResult.ParseError)
+    }
+
+    @Test
+    fun fetchResult_networkFailure_reportsNetworkError() = runTest {
+        // Port 1 on localhost: connection refused, no server involved.
+        val unreachable = ChmuDataSource(
+            client = OkHttpClient(),
+            urlForDate = { dateCompact -> "http://127.0.0.1:1/10m-$dateCompact.json" }
+        )
+
+        val r = unreachable.fetchResult()
+
+        assertTrue("was $r", r is FetchResult.NetworkError)
+    }
 }

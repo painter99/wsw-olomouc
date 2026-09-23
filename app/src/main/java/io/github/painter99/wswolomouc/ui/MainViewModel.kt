@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.painter99.wswolomouc.data.WeatherRepository
 import javax.inject.Inject
+import kotlin.math.ceil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,8 +31,23 @@ class MainViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isRefreshing = true, rateLimitMessage = null)
             val snapshot = repository.refresh()
-            _uiState.value = MainUiStateMapper.from(snapshot, clock())
+            val nowMs = clock()
+            val rateLimitMessage = if (snapshot.skippedByRateLimit) {
+                snapshot.nextRefreshAllowedAtMs
+                    ?.takeIf { it > nowMs }
+                    ?.let {
+                        val minutes = ceil((it - nowMs) / 60_000.0).toInt()
+                        "Limit aktualizací – zkuste znovu za $minutes min"
+                    }
+            } else {
+                null
+            }
+            _uiState.value = MainUiStateMapper.from(snapshot, nowMs).copy(
+                isRefreshing = false,
+                rateLimitMessage = rateLimitMessage
+            )
         }
     }
 }

@@ -1,6 +1,7 @@
 package io.github.painter99.wswolomouc.ui
 
 import io.github.painter99.wswolomouc.Sources
+import io.github.painter99.wswolomouc.data.FetchResult
 import io.github.painter99.wswolomouc.data.StationMeasurement
 import io.github.painter99.wswolomouc.data.WeatherRepository
 
@@ -39,7 +40,9 @@ data class StationUi(
     val measuredAtMs: Long?,
     val isStale: Boolean,
     /** false = placeholder card ("bez dat"), true = real measurement. */
-    val hasData: Boolean
+    val hasData: Boolean,
+    /** Per-source fetch outcome note (M1.6b-3), e.g. "HTTP 404"; null = OK/no attempt. */
+    val statusNote: String? = null
 ) {
     companion object {
         fun displayNameFor(station: String): String = when (station) {
@@ -64,7 +67,17 @@ data class MainUiState(
     val isLoading: Boolean = true,
     val freshness: WeatherRepository.Freshness? = null,
     val primary: StationUi? = null,
-    val secondary: StationUi? = null
+    val secondary: StationUi? = null,
+    /**
+     * Per-source fetch outcome label (M1.6b-3): station id -> "OK" /
+     * "HTTP 404" / "síť" / "data". Shown in the status row so a failing
+     * source is visible instead of a global "Offline" guess.
+     */
+    val sourceStatus: Map<String, String> = emptyMap(),
+    /** True while a refresh is running (M1.6b-3 refresh feedback). */
+    val isRefreshing: Boolean = false,
+    /** Non-null = refresh was skipped by the rate limit; text says when to retry. */
+    val rateLimitMessage: String? = null
 )
 
 object MainUiStateMapper {
@@ -77,11 +90,32 @@ object MainUiStateMapper {
         freshness = snapshot.freshness,
         primary = snapshot.measurements[Sources.STATION_INFOPOCASI]
             ?.let { stationUi(it, nowMs) }
-            ?: placeholder(Sources.STATION_INFOPOCASI),
+            ?: placeholder(
+                Sources.STATION_INFOPOCASI,
+                noteFor(snapshot, Sources.STATION_INFOPOCASI)
+            ),
         secondary = snapshot.measurements[Sources.STATION_CHMU]
             ?.let { stationUi(it, nowMs) }
-            ?: placeholder(Sources.STATION_CHMU)
+            ?: placeholder(
+                Sources.STATION_CHMU,
+                noteFor(snapshot, Sources.STATION_CHMU)
+            ),
+        sourceStatus = snapshot.sourceResults.mapValues { statusLabel(it.value) }
     )
+
+    /** Failure note for a station card; null for Success / no attempt. */
+    private fun noteFor(snapshot: WeatherRepository.Snapshot, station: String): String? =
+        snapshot.sourceResults[station]?.let { r ->
+            if (r is FetchResult.Success) null else statusLabel(r)
+        }
+
+    /** Short per-source outcome label for the UI (M1.6b-3). */
+    fun statusLabel(result: FetchResult): String = when (result) {
+        is FetchResult.Success -> "OK"
+        is FetchResult.HttpError -> "HTTP ${result.code}"
+        is FetchResult.NetworkError -> "síť"
+        is FetchResult.ParseError -> "data"
+    }
 
     fun stationUi(m: StationMeasurement, nowMs: Long): StationUi = StationUi(
         station = m.station,
@@ -100,7 +134,7 @@ object MainUiStateMapper {
     )
 
     /** Card for a station with no data at all (M1.6a.1). */
-    fun placeholder(station: String): StationUi = StationUi(
+    fun placeholder(station: String, statusNote: String? = null): StationUi = StationUi(
         station = station,
         displayName = StationUi.displayNameFor(station),
         temperatureC = null,
@@ -113,6 +147,7 @@ object MainUiStateMapper {
         rainLabel = StationUi.rainLabelFor(station),
         measuredAtMs = null,
         isStale = false,
-        hasData = false
+        hasData = false,
+        statusNote = statusNote
     )
 }

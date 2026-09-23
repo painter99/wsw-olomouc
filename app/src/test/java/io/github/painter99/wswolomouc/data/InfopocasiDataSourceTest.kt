@@ -78,4 +78,39 @@ class InfopocasiDataSourceTest {
         server.enqueue(MockResponse().setBody("not a customclientraw file"))
         assertNull(dataSource().fetch())
     }
+
+    // --- M1.6b-3: detailed fetch outcome -----------------------------------
+
+    @Test
+    fun fetchResult_success_wrapsMeasurement() = runTest {
+        server.enqueue(MockResponse().setBody(fixture()))
+
+        val r = dataSource().fetchResult()
+
+        assertTrue("was $r", r is FetchResult.Success)
+        assertEquals(13.6f, (r as FetchResult.Success).measurement.temperatureC!!, 0.01f)
+    }
+
+    @Test
+    fun fetchResult_http500_reportsHttpErrorWithCode() = runTest {
+        server.enqueue(MockResponse().setResponseCode(500))
+
+        val r = dataSource().fetchResult()
+
+        assertTrue("was $r", r is FetchResult.HttpError)
+        assertEquals(500, (r as FetchResult.HttpError).code)
+    }
+
+    @Test
+    fun fetchResult_networkFailure_reportsNetworkError() = runTest {
+        // Port 1 on localhost: connection refused, no server involved.
+        val ds = InfopocasiDataSource(
+            OkHttpClient(),
+            url = "http://127.0.0.1:1/customclientraw.txt"
+        )
+
+        val r = ds.fetchResult()
+
+        assertTrue("was $r", r is FetchResult.NetworkError)
+    }
 }

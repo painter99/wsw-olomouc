@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -114,7 +116,18 @@ fun MainContent(state: MainUiState, nowMs: Long, onRefresh: () -> Unit) {
         StatusRow(state, nowMs)
         state.primary?.let { StationCard(it, nowMs, isPrimary = true) }
         state.secondary?.let { StationCard(it, nowMs, isPrimary = false) }
-        TextButton(onClick = onRefresh) { Text("Aktualizovat") }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            TextButton(onClick = onRefresh, enabled = !state.isRefreshing) {
+                if (state.isRefreshing) {
+                    CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
+                    Spacer(Modifier.width(8.dp))
+                }
+                Text(if (state.isRefreshing) "Aktualizuji…" else "Aktualizovat")
+            }
+        }
+        state.rateLimitMessage?.let {
+            Text(it, style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
 
@@ -149,6 +162,16 @@ fun StatusRow(state: MainUiState, nowMs: Long) {
                 )
             }
         }
+    }
+
+    // M1.6b-3: per-source outcome instead of a global "Offline" guess.
+    if (state.sourceStatus.isNotEmpty()) {
+        Text(
+            text = state.sourceStatus.entries.joinToString(" · ") {
+                "${StationUi.displayNameFor(it.key)}: ${it.value}"
+            },
+            style = MaterialTheme.typography.bodySmall
+        )
     }
 }
 
@@ -208,6 +231,13 @@ fun StationCard(s: StationUi, nowMs: Long, isPrimary: Boolean) {
                 } ?: "Bez dat",
                 style = MaterialTheme.typography.bodySmall
             )
+            // M1.6b-3: why the last fetch failed (null when OK / no attempt).
+            s.statusNote?.let {
+                Text(
+                    text = "Poslední dotaz: $it",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }

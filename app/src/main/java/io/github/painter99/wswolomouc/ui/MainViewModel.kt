@@ -44,7 +44,16 @@ class MainViewModel @Inject constructor(
             // network (10 s timeouts made the app look frozen).
             val cached = repository.latestFromCache()
             val now0 = clock()
-            _uiState.value = if (cached.isNotEmpty()) {
+            // Round 7 fix (Pavel 23. 9.): when the newest cached measurement
+            // is fresher than the rate limit, do NOT touch the network on
+            // startup — opening the app must not burn the 10-min manual
+            // refresh budget (the "limit za 10 min" right after opening).
+            val newestCachedAt = cached.values.maxOfOrNull { it.measuredAtMs } ?: 0L
+            val willRefresh = now0 - newestCachedAt >= Sources.FETCH_RATE_LIMIT_MS
+            // ONE atomic assignment (isRefreshing included) — otherwise
+            // awaiters could observe the cache-first state between it and
+            // refresh() and read a half-final state (CI run #86).
+            _uiState.value = (if (cached.isNotEmpty()) {
                 val freshness = if (
                     cached.values.all {
                         now0 - it.measuredAtMs <= Sources.STALE_THRESHOLD_MIN * 60_000
@@ -65,13 +74,8 @@ class MainViewModel @Inject constructor(
                     primary = MainUiStateMapper.placeholder(Sources.STATION_INFOPOCASI),
                     secondary = MainUiStateMapper.placeholder(Sources.STATION_CHMU)
                 )
-            }
-            // Round 7 fix (Pavel 23. 9.): when the newest cached measurement
-            // is fresher than the rate limit, do NOT touch the network on
-            // startup — opening the app must not burn the 10-min manual
-            // refresh budget (the "limit za 10 min" right after opening).
-            val newestCachedAt = cached.values.maxOfOrNull { it.measuredAtMs } ?: 0L
-            if (now0 - newestCachedAt >= Sources.FETCH_RATE_LIMIT_MS) {
+            }).copy(isRefreshing = willRefresh)
+            if (willRefresh) {
                 refresh()
             }
         }

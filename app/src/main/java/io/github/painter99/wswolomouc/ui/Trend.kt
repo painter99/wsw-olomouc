@@ -24,7 +24,9 @@ object Trend {
 
     fun compute(currentC: Float?, pastC: Float?): TrendDirection? {
         if (currentC == null || pastC == null) return null
-        val diff = currentC - pastC
+        // Round to 0.1 °C (the display precision) so float noise does not
+        // push an exactly-at-threshold change over the limit (run #72).
+        val diff = Math.round((currentC - pastC) * 10f) / 10.0
         return when {
             diff > THRESHOLD_C -> TrendDirection.RISING
             diff < -THRESHOLD_C -> TrendDirection.FALLING

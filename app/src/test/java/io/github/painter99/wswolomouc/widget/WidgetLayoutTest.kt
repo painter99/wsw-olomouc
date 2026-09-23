@@ -130,18 +130,19 @@ class WidgetLayoutTest {
     }
 
     @Test
-    fun onlyChmuFresh_secondaryFromChmu_dailyRainLabel() {
+    fun otherwise_primaryWins_evenWhenStale_secondaryFromPrimary() {
         val s = build(
             infopocasi = measurement(Sources.STATION_INFOPOCASI, 12.0f, 120),
             chmu = measurement(
                 Sources.STATION_CHMU, 18.0f, 12, humidityPct = 68, windMs = 4.0f, rainDailyMm = 0.2f
             )
         )
-        assertEquals("ČHMÚ Holice", s.left.badge)
-        assertEquals(Sources.STATION_CHMU, s.left.sourceStation)
-        assertEquals("18,0 °C", s.secondary[0].text) // T=18 outside WC and HI domains
-        assertEquals("14 km/h", s.secondary[1].text)
-        assertEquals("0,2 mm (den)", s.secondary[2].text) // unified daily label
+        // Pavel 23. 9.: "jinak jede vlevo infopocasi" — the primary wins even
+        // when stale; the fresh CHMU value does NOT override it.
+        assertEquals("Infopocasi", s.left.badge)
+        assertEquals(Sources.STATION_INFOPOCASI, s.left.sourceStation)
+        assertEquals(WidgetStatus.STALE, s.left.status)
+        assertEquals("12,0 °C", s.secondary[0].text)
         // Both stations still present; Infopocasi is the stale one.
         assertTrue(s.stations[0].isStale)
         assertFalse(s.stations[1].isStale)
@@ -178,10 +179,12 @@ class WidgetLayoutTest {
             ),
             chmu = measurement(Sources.STATION_CHMU, 14.2f, 120)
         )
-        assertEquals("Infopocasi", s.left.badge)
-        assertNull(s.left.temperatureC)
-        assertEquals(listOf("Vítr"), s.secondary.map { it.label })
-        assertEquals("11 km/h", s.secondary[0].text)
+        // Primary has no temperature -> newest available value (CHMU) is
+        // shown and the secondary row follows the station behind the badge.
+        assertEquals("ČHMÚ Holice", s.left.badge)
+        assertEquals(14.2f, s.left.temperatureC!!, 0.001f)
+        assertEquals(listOf("Pocitová"), s.secondary.map { it.label })
+        assertEquals("14,2 °C", s.secondary[0].text)
     }
 
     @Test

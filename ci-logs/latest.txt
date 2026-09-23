@@ -1,4 +1,4 @@
-# CI run 74 — commit 1ad8325 — m17-trend
+# CI run 75 — commit 1411e80 — m17-trend
 
 ===== build_output.txt =====
 Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
@@ -28,58 +28,34 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:parseDebugLocalResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
-> Task :app:preDebugUnitTestBuild UP-TO-DATE
-> Task :app:javaPreCompileDebug
 > Task :app:processDebugManifestForPackage
+> Task :app:javaPreCompileDebug
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
 > Task :app:javaPreCompileDebugUnitTest
 > Task :app:processDebugResources
 > Task :app:kspDebugKotlin
-> Task :app:compileDebugKotlin
-> Task :app:compileDebugJavaWithJavac
-> Task :app:hiltAggregateDepsDebug
-> Task :app:hiltJavaCompileDebug
-> Task :app:processDebugJavaRes
-> Task :app:bundleDebugClassesToCompileJar
-> Task :app:transformDebugClassesWithAsm
-> Task :app:bundleDebugClassesToRuntimeJar
-> Task :app:kspDebugUnitTestKotlin
 
-> Task :app:compileDebugUnitTestKotlin FAILED
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/FormatTest.kt:55:43 Unresolved reference 'windRange'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/FormatTest.kt:56:40 Unresolved reference 'windRange'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/FormatTest.kt:57:34 Unresolved reference 'windRange'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:84:21 Unresolved reference 'ThemeStore'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:94:48 Argument already passed for this parameter.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:97:36 Unresolved reference 'ThemeStore'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:98:28 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:98:45 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:99:9 'mode' overrides nothing.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:99:33 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:100:9 'set' overrides nothing.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:100:40 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:230:22 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:230:43 Unresolved reference 'themeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:230:53 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:231:12 Unresolved reference 'setTheme'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:231:21 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:232:22 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:232:41 Unresolved reference 'themeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainViewModelTest.kt:232:51 Cannot infer type for this parameter. Please specify it explicitly.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/ThemeModeTest.kt:11:22 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/ThemeModeTest.kt:11:40 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/ThemeModeTest.kt:12:22 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/ThemeModeTest.kt:12:39 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/ThemeModeTest.kt:13:22 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/ThemeModeTest.kt:13:38 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/ThemeModeTest.kt:14:22 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/ThemeModeTest.kt:14:40 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/ThemeModeTest.kt:15:22 Unresolved reference 'ThemeMode'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/ThemeModeTest.kt:15:40 Unresolved reference 'ThemeMode'.
+> Task :app:compileDebugKotlin FAILED
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:75:75 Unresolved reference 'ThemeMode'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:76:29 'when' expression must be exhaustive. Add the 'SYSTEM', 'LIGHT', 'DARK' branches or an 'else' branch.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:77:17 Unresolved reference 'ThemeMode'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:78:17 Unresolved reference 'ThemeMode'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:79:17 Unresolved reference 'ThemeMode'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:94:67 Unresolved reference 'ThemeMode'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:133:16 Unresolved reference 'ThemeMode'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:135:18 Unresolved reference 'ThemeMode'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:187:13 Unresolved reference 'ThemeMode'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:187:41 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:188:29 'when' expression must be exhaustive. Add an 'else' branch.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:189:21 Unresolved reference 'ThemeMode'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:190:21 Unresolved reference 'ThemeMode'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:191:21 Unresolved reference 'ThemeMode'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/MainActivity.kt:193:17 @Composable invocations can only happen from the context of a @Composable function
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':app:compileDebugUnitTestKotlin'.
+Execution failed for task ':app:compileDebugKotlin'.
 > A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
    > Compilation error. See log for more details
 
@@ -89,7 +65,7 @@ Execution failed for task ':app:compileDebugUnitTestKotlin'.
 > Get more help at https://help.gradle.org.
 
 * Exception is:
-org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileDebugUnitTestKotlin'.
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileDebugKotlin'.
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
 	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
@@ -278,6 +254,6 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 2m 6s
-26 actionable tasks: 26 executed
+BUILD FAILED in 1m 47s
+17 actionable tasks: 17 executed
 

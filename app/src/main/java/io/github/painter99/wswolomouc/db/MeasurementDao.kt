@@ -17,6 +17,13 @@ interface MeasurementDao {
     @Query("SELECT * FROM measurement WHERE station = :station ORDER BY measuredAt DESC LIMIT 1")
     suspend fun latestForStation(station: String): MeasurementEntity?
 
+    /** Latest row at or before the cutoff — the "past" point for trend arrows. */
+    @Query(
+        "SELECT * FROM measurement WHERE station = :station " +
+            "AND measuredAt <= :beforeEpochMs ORDER BY measuredAt DESC LIMIT 1"
+    )
+    suspend fun latestBefore(station: String, beforeEpochMs: Long): MeasurementEntity?
+
     @Query("SELECT * FROM measurement WHERE measuredAt >= :fromEpochMs ORDER BY measuredAt ASC")
     suspend fun since(fromEpochMs: Long): List<MeasurementEntity>
 

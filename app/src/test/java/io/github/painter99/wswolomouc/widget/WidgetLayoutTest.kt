@@ -2,6 +2,7 @@ package io.github.painter99.wswolomouc.widget
 
 import io.github.painter99.wswolomouc.Sources
 import io.github.painter99.wswolomouc.data.StationMeasurement
+import io.github.painter99.wswolomouc.ui.TrendDirection
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -33,6 +34,7 @@ class WidgetLayoutTest {
         ageMin: Long,
         humidityPct: Int? = 60,
         windMs: Float? = null,
+        windGustMs: Float? = null,
         rainMm: Float? = null,
         rainDailyMm: Float? = null
     ): StationMeasurement = StationMeasurement(
@@ -41,7 +43,7 @@ class WidgetLayoutTest {
         humidityPct = humidityPct,
         pressureHpa = null,
         windMs = windMs,
-        windGustMs = null,
+        windGustMs = windGustMs,
         windDirDeg = null,
         rainMm = rainMm,
         rainDailyMm = rainDailyMm,
@@ -52,17 +54,18 @@ class WidgetLayoutTest {
     private fun build(
         infopocasi: StationMeasurement?,
         chmu: StationMeasurement?,
-        wide: Boolean = false
+        wide: Boolean = false,
+        trend: TrendDirection? = null
     ): WidgetLayoutState {
         val map = buildMap {
             infopocasi?.let { put(Sources.STATION_INFOPOCASI, it) }
             chmu?.let { put(Sources.STATION_CHMU, it) }
         }
-        return WidgetLayout.build(map, now, wide)
+        return WidgetLayout.build(map, now, wide, trend)
     }
 
     @Test
-    fun bothFresh_leftAverage_secondaryFromPrimary() {
+    fun bothFresh_secondaryAlsoWeightedByFreshness() {
         val s = build(
             infopocasi = measurement(
                 Sources.STATION_INFOPOCASI, 21.0f, 5, windMs = 3.0f, rainDailyMm = 0.5f
@@ -71,16 +74,40 @@ class WidgetLayoutTest {
                 Sources.STATION_CHMU, 23.0f, 10, humidityPct = 68, windMs = 4.0f, rainDailyMm = 0.2f
             )
         )
-        assertEquals(22.0f, s.left.temperatureC!!, 0.001f)
+        assertEquals(21.889f, s.left.temperatureC!!, 0.01f) // freshness-weighted (round 3)
         assertEquals("Ø 2 stanice", s.left.badge)
         assertEquals(WidgetStatus.OK, s.left.status)
         assertEquals(Sources.STATION_INFOPOCASI, s.left.sourceStation)
         assertEquals(now - 10 * minute, s.left.measuredAtMs) // honest age = older
-        // Secondary row from the PRIMARY station (F2.5: synthesis is temp only)
+        // Round 6 (Pavel 23. 9.): the secondary row is ALSO freshness-weighted
+        // (w = 1/(age+15)), not just the primary station's values:
+        // wind (3*1/20 + 4*1/25)/0.09 = 3.44 m/s -> 12 km/h,
+        // rain (0.5*1/20 + 0.2*1/25)/0.09 = 0.37 mm -> "0,4 mm (den)",
+        // feels-like from the averaged T/wind/RH -> 21,9 °C (T > 10 °C domain).
         assertEquals(listOf("Pocitová", "Vítr", "Srážky"), s.secondary.map { it.label })
-        assertEquals("21,0 °C", s.secondary[0].text)  // one decimal (Pavel 22. 9.)
-        assertEquals("11 km/h", s.secondary[1].text)  // 3.0 m/s -> ONCE to km/h
-        assertEquals("0,5 mm (den)", s.secondary[2].text) // daily, BOTH sources
+        assertEquals("21,9 °C", s.secondary[0].text)
+        assertEquals("12 km/h", s.secondary[1].text)
+        assertEquals("0,4 mm (den)", s.secondary[2].text)
+    }
+
+    @Test
+    fun bothFresh_windGustRain_weightedToo() {
+        val s = build(
+            infopocasi = measurement(
+                Sources.STATION_INFOPOCASI, 14.0f, 2,
+                windMs = 2.0f, windGustMs = 3.0f, rainDailyMm = 1.0f
+            ),
+            chmu = measurement(
+                Sources.STATION_CHMU, 16.0f, 28,
+                windMs = 6.0f, windGustMs = 9.0f, rainDailyMm = 0.0f
+            )
+        )
+        // weights: 1/17 (Infopocasi, 2 min) vs 1/43 (CHMU, 28 min)
+        // wind  -> 3.13 m/s -> 11 km/h; gust -> 4.70 m/s -> 17 km/h
+        // rain  -> 0.72 mm -> "0,7 mm (den)"; feels-like = averaged T (14,6 °C)
+        assertEquals("14,6 °C", s.secondary[0].text)
+        assertEquals("11–17 km/h", s.secondary[1].text)
+        assertEquals("0,7 mm (den)", s.secondary[2].text)
     }
 
     @Test
@@ -128,18 +155,19 @@ class WidgetLayoutTest {
     }
 
     @Test
-    fun onlyChmuFresh_secondaryFromChmu_dailyRainLabel() {
+    fun otherwise_primaryWins_evenWhenStale_secondaryFromPrimary() {
         val s = build(
             infopocasi = measurement(Sources.STATION_INFOPOCASI, 12.0f, 120),
             chmu = measurement(
                 Sources.STATION_CHMU, 18.0f, 12, humidityPct = 68, windMs = 4.0f, rainDailyMm = 0.2f
             )
         )
-        assertEquals("ČHMÚ Holice", s.left.badge)
-        assertEquals(Sources.STATION_CHMU, s.left.sourceStation)
-        assertEquals("18,0 °C", s.secondary[0].text) // T=18 outside WC and HI domains
-        assertEquals("14 km/h", s.secondary[1].text)
-        assertEquals("0,2 mm (den)", s.secondary[2].text) // unified daily label
+        // Pavel 23. 9.: "jinak jede vlevo infopocasi" — the primary wins even
+        // when stale; the fresh CHMU value does NOT override it.
+        assertEquals("Infopocasi", s.left.badge)
+        assertEquals(Sources.STATION_INFOPOCASI, s.left.sourceStation)
+        assertEquals(WidgetStatus.STALE, s.left.status)
+        assertEquals("12,0 °C", s.secondary[0].text)
         // Both stations still present; Infopocasi is the stale one.
         assertTrue(s.stations[0].isStale)
         assertFalse(s.stations[1].isStale)
@@ -176,10 +204,12 @@ class WidgetLayoutTest {
             ),
             chmu = measurement(Sources.STATION_CHMU, 14.2f, 120)
         )
-        assertEquals("Infopocasi", s.left.badge)
-        assertNull(s.left.temperatureC)
-        assertEquals(listOf("Vítr"), s.secondary.map { it.label })
-        assertEquals("11 km/h", s.secondary[0].text)
+        // Primary has no temperature -> newest available value (CHMU) is
+        // shown and the secondary row follows the station behind the badge.
+        assertEquals("ČHMÚ Holice", s.left.badge)
+        assertEquals(14.2f, s.left.temperatureC!!, 0.001f)
+        assertEquals(listOf("Pocitová"), s.secondary.map { it.label })
+        assertEquals("14,2 °C", s.secondary[0].text)
     }
 
     @Test
@@ -188,5 +218,20 @@ class WidgetLayoutTest {
         val chmu = measurement(Sources.STATION_CHMU, 23.0f, 10, humidityPct = 68)
         assertFalse(build(infopocasi, chmu, wide = false).showStationHumidity)
         assertTrue(build(infopocasi, chmu, wide = true).showStationHumidity)
+    }
+
+    /**
+     * M1.7-trend (Pavel 23. 9.): ONE trend arrow (3 h window) next to the big
+     * temperature — carried into the left widget state by the caller (the
+     * widget computes it from Room history, the layout stays pure).
+     */
+    @Test
+    fun trend_isCarriedIntoTheLeftWidgetState() {
+        val s = build(
+            infopocasi = measurement(Sources.STATION_INFOPOCASI, 21.0f, 5),
+            chmu = measurement(Sources.STATION_CHMU, 23.0f, 10),
+            trend = TrendDirection.RISING
+        )
+        assertEquals(TrendDirection.RISING, s.left.trend)
     }
 }

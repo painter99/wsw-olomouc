@@ -22,6 +22,16 @@ object SyncSchedule {
     /** Flex window — how early the job may start within the interval. */
     const val FLEX_MINUTES = 5L
 
+    /**
+     * Phase offset of the SECOND periodic worker (round 4, Pavel 23. 9.).
+     * WorkManager's periodic minimum is a hard 15-min floor — a 5/10-min
+     * periodic is impossible. Two 15-min periodics offset by 7 min halve the
+     * effective gap; the repository rate limit (10 min per source, F1.5)
+     * dedupes actual fetches, so CHMU is caught at most ~10 min after its
+     * hourly publication.
+     */
+    const val PHASE_OFFSET_MINUTES = 7L
+
     /** Normalized schedule parameters, ready for a PeriodicWorkRequest. */
     data class Spec(val intervalMinutes: Long, val flexMinutes: Long)
 

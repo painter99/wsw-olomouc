@@ -77,7 +77,12 @@ data class MainUiState(
     /** True while a refresh is running (M1.6b-3 refresh feedback). */
     val isRefreshing: Boolean = false,
     /** Non-null = refresh was skipped by the rate limit; text says when to retry. */
-    val rateLimitMessage: String? = null
+    val rateLimitMessage: String? = null,
+    /**
+     * Temperature trend of the PRIMARY station for 1 h / 3 h / 6 h windows
+     * (M1.7-trend, Pavel 23. 9.); empty when the primary has no data.
+     */
+    val trends: List<TrendItem> = emptyList()
 )
 
 object MainUiStateMapper {

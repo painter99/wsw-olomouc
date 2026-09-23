@@ -26,6 +26,17 @@ object Format {
     fun wind(ms: Float?): String =
         if (ms == null) "—" else "${(ms * 3.6f).roundToInt()} km/h"
 
+    /**
+     * Wind + gust in ONE item (round 2, Pavel 23. 9.): "11–18 km/h" — keeps
+     * the widget secondary row at 3 items (NF8). Without a gust it behaves
+     * exactly like [wind].
+     */
+    fun windRange(ms: Float?, gustMs: Float?): String {
+        if (ms == null) return "—"
+        val wind = (ms * 3.6f).roundToInt()
+        return if (gustMs == null) "$wind km/h" else "$wind–${(gustMs * 3.6f).roundToInt()} km/h"
+    }
+
     fun rain(mm: Float?): String =
         if (mm == null) "—" else String.format(Locale("cs"), "%.1f", mm) + " mm"
 }

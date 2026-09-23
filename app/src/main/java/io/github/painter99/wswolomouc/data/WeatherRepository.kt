@@ -131,6 +131,16 @@ class WeatherRepository(
         result
     }
 
+    /**
+     * Temperature of the latest measurement at or before [beforeEpochMs] —
+     * the "past" point for the trend arrows (PRD Fáze 2). Null when the
+     * station has no history that far back.
+     */
+    suspend fun pastTemperature(station: String, beforeEpochMs: Long): Float? =
+        withContext(Dispatchers.IO) {
+            dao.latestBefore(station, beforeEpochMs)?.temperatureC
+        }
+
     private fun isFresh(m: StationMeasurement, now: Long): Boolean =
         now - m.measuredAtMs <= Sources.STALE_THRESHOLD_MIN * 60_000
 }

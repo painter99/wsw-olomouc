@@ -30,4 +30,18 @@ object Sources {
     /** Daily CHMU data file URL for the given date (yyyyMMdd). */
     fun chmuDailyUrl(dateCompact: String): String =
         CHMU_BASE + "10m-" + CHMU_STATION_CODE + "-" + dateCompact + ".json"
+
+    // --- Official web pages + licenses (M1.7-trend, Pavel 23. 9., F5.4) ------
+    // The app must link the OFFICIAL pages of both sources, licenses visible
+    // "podle standardů".
+
+    /** Infopocasi station page (the operator — consent 23. 9. 2026). */
+    const val INFOPOCASI_WEB = "https://infopocasi-olomouc.cz/meridla"
+
+    /** Official CHMU station page for Olomouc-Holice (O2OLOM01). */
+    const val CHMU_WEB =
+        "https://www.chmi.cz/namerena-data/merici-stanice/meteorologicke/o2olom01-olomouc-holice"
+
+    /** CHMU open data license (CC BY 4.0) — attribution must be visible. */
+    const val CHMU_LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/"
 }

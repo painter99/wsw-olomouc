@@ -5,6 +5,7 @@ import io.github.painter99.wswolomouc.db.MeasurementDao
 import io.github.painter99.wswolomouc.db.MeasurementEntity
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -24,6 +25,9 @@ class WeatherRepositoryTest {
         override suspend fun insert(m: MeasurementEntity): Long { rows.add(m); return rows.size.toLong() }
         override suspend fun latestForStation(station: String): MeasurementEntity? =
             rows.filter { it.station == station }.maxByOrNull { it.measuredAt }
+        override suspend fun latestBefore(station: String, beforeEpochMs: Long): MeasurementEntity? =
+            rows.filter { it.station == station && it.measuredAt <= beforeEpochMs }
+                .maxByOrNull { it.measuredAt }
         override suspend fun since(fromEpochMs: Long): List<MeasurementEntity> =
             rows.filter { it.measuredAt >= fromEpochMs }.sortedBy { it.measuredAt }
         override suspend fun deleteFetchedBefore(beforeEpochMs: Long): Int {
@@ -264,5 +268,23 @@ class WeatherRepositoryTest {
 
         assertTrue(second.skippedByRateLimit)
         assertEquals(now + Sources.FETCH_RATE_LIMIT_MS, second.nextRefreshAllowedAtMs)
+    }
+
+    // --- M1.7-trend: past temperature lookup (trend arrows) ------------------
+
+    @Test
+    fun pastTemperature_returnsLatestRowAtOrBeforeTheCutoff() = runTest {
+        val hour = 3_600_000L
+        val dao = FakeDao()
+        dao.insert(measurement(Sources.STATION_INFOPOCASI, now - 3 * hour, temp = 12f).toEntity())
+        dao.insert(measurement(Sources.STATION_INFOPOCASI, now - 1 * hour, temp = 14f).toEntity())
+        val repo = WeatherRepository(
+            listOf(FakeSource(Sources.STATION_INFOPOCASI, null)), dao, clock = { now }
+        )
+
+        // Latest row at or before the cutoff (boundary inclusive).
+        assertEquals(12f, repo.pastTemperature(Sources.STATION_INFOPOCASI, now - 3 * hour)!!, 0.001f)
+        assertEquals(14f, repo.pastTemperature(Sources.STATION_INFOPOCASI, now - 1 * hour)!!, 0.001f)
+        assertNull(repo.pastTemperature(Sources.STATION_INFOPOCASI, now - 5 * hour))
     }
 }

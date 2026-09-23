@@ -4,6 +4,7 @@ import io.github.painter99.wswolomouc.Sources
 import io.github.painter99.wswolomouc.data.StationMeasurement
 import io.github.painter99.wswolomouc.ui.FeelsLike
 import io.github.painter99.wswolomouc.ui.Format
+import io.github.painter99.wswolomouc.ui.TrendDirection
 
 /** One secondary-row entry (PRD F2.6/NF8): label + preformatted value. */
 data class SecondaryItem(val label: String, val text: String)
@@ -44,8 +45,8 @@ data class WidgetLayoutState(
  *
  *  1. Left half is the unchanged F2.5 synthesis; the secondary row takes its
  *     values from the station behind the left badge — with the average badge
- *     ("Ø 2 stanice") non-temperature values come from the PRIMARY station
- *     (F2.5: synthesis applies to temperature only).
+ *     ("Ø 2 stanice") the values are the freshness-weighted averages of BOTH
+ *     stations (round 6, Pavel 23. 9.; F2.5 wording rules still apply).
  *  2. Both station blocks always appear, each with its own last-measurement
  *     time (honest per-source age).
  *  3. Feels-like uses FeelsLike.calculate(T, windMs * 3.6, RH) — wind is
@@ -61,11 +62,19 @@ object WidgetLayout {
     fun build(
         measurements: Map<String, StationMeasurement>,
         nowMs: Long,
-        wide: Boolean
+        wide: Boolean,
+        trend: TrendDirection? = null
     ): WidgetLayoutState {
-        val left = WidgetSynthesis.synthesize(measurements, nowMs)
+        val left = WidgetSynthesis.synthesize(measurements, nowMs).copy(trend = trend)
 
-        val source = left.sourceStation?.let { measurements[it] }
+        // Round 6 (Pavel 23. 9.): with the "Ø 2 stanice" badge the secondary
+        // row uses the freshness-weighted average of ALL parameters (wind,
+        // gusts, humidity, rain) — not just the primary station's values.
+        val source = if (left.badge == "Ø 2 stanice") {
+            WidgetSynthesis.weightedMeasurement(measurements, nowMs)
+        } else {
+            left.sourceStation?.let { measurements[it] }
+        }
         val secondary = source?.let { secondaryItems(it) } ?: emptyList()
 
         val stations = listOf(
@@ -111,7 +120,11 @@ object WidgetLayout {
             val feels = FeelsLike.calculate(t, m.windMs?.times(3.6f), m.humidityPct)
             items += SecondaryItem("Pocitová", Format.temperaturePrecise(feels))
         }
-        m.windMs?.let { items += SecondaryItem("Vítr", Format.wind(it)) }
+        m.windMs?.let {
+            // Gust joined into ONE item (round 2, Pavel 23. 9.) — keeps the
+            // row at max 3 items (NF8).
+            items += SecondaryItem("Vítr", Format.windRange(m.windMs, m.windGustMs))
+        }
         // Rain unified to the DAILY total for both sources (Pavel 22. 9.);
         // the CHMU 10-min value stays in the DB history only.
         m.rainDailyMm?.let { items += SecondaryItem("Srážky", Format.rain(it) + " (den)") }

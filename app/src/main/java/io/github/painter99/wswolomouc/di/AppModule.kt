@@ -12,6 +12,8 @@ import io.github.painter99.wswolomouc.data.InfopocasiDataSource
 import io.github.painter99.wswolomouc.data.WeatherRepository
 import io.github.painter99.wswolomouc.db.AppDatabase
 import io.github.painter99.wswolomouc.db.MeasurementDao
+import io.github.painter99.wswolomouc.ui.DataStoreThemeStore
+import io.github.painter99.wswolomouc.ui.ThemeStore
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 import okhttp3.OkHttpClient
@@ -62,4 +64,10 @@ object AppModule {
             ),
             dao = dao
         )
+
+    /** Persisted theme preference (round 2, Pavel 23. 9. 2026). */
+    @Provides
+    @Singleton
+    fun themeStore(@ApplicationContext context: Context): ThemeStore =
+        DataStoreThemeStore(context)
 }

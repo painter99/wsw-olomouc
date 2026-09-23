@@ -176,11 +176,6 @@ fun WidgetContent(layout: WidgetLayoutState, nowMs: Long) {
                     text = layout.left.measuredAtMs?.let { "Měření " + clockTime(it) } ?: "Bez dat",
                     style = textStyle(14)
                 )
-                // Pavel 23. 9. (round 2): explain CHMU's role right on the widget.
-                Text(
-                    text = "ČHMÚ = záloha · publikace ~1×/hod",
-                    style = textStyle(12)
-                )
             }
             Spacer(modifier = GlanceModifier.width(10.dp))
             // RIGHT half: BOTH stations, each with its own last-update time.

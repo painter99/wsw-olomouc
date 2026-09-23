@@ -113,9 +113,11 @@ fun MainScreen(viewModel: MainViewModel) {
 
     Surface(
         color = MaterialTheme.colorScheme.background,
-        // M1.6a.1: targetSdk 35 draws edge-to-edge — keep content below the
-        // status bar (the status row collided with clock/indicators).
-        modifier = Modifier.fillMaxSize().statusBarsPadding()
+        // Round 3: the Surface fills the WHOLE screen (including the status
+        // bar area) so the app background color reaches behind the clock —
+        // no white strip in dark theme. The content padding moved into
+        // MainContent's Column.
+        modifier = Modifier.fillMaxSize()
     ) {
         MainContent(
             state = state,
@@ -144,9 +146,12 @@ fun MainContent(
 
     Column(
         // Round 2 (Pavel 23. 9.): the screen must SCROLL — without it the
-        // bottom rows (sources, licenses) were unreachable.
+        // bottom rows (sources, licenses) were unreachable. Round 3: the
+        // status-bar padding lives HERE (the Surface above fills the whole
+        // screen, killing the white strip in dark theme).
         modifier = Modifier
             .fillMaxSize()
+            .statusBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -173,9 +178,12 @@ fun MainContent(
             Text(it, style = MaterialTheme.typography.bodySmall)
         }
         // Round 2 (Pavel 23. 9., #8): explain CHMU's role in the app too.
+        // Round 3: disclose the freshness-weighted average formula.
         Text(
             text = "ČHMÚ Holice slouží k porovnání a jako záloha – ČHMÚ publikuje " +
-                "měření zhruba jednou za hodinu, čerstvější je Infopocasi.",
+                "měření zhruba jednou za hodinu, čerstvější je Infopocasi. Průměr " +
+                "obou stanic je vážený čerstvostí: čerstvější měření má větší váhu " +
+                "(váha = 1/(stáří + 15 min)).",
             style = MaterialTheme.typography.bodySmall
         )
         // Round 2 (Pavel 23. 9., #5): theme switch, persisted in DataStore.

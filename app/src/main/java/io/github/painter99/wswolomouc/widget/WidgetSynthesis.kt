@@ -39,10 +39,12 @@ data class WidgetState(
  * WidgetSynthesisTest:
  *
  *  1. Both stations usable (fresh <= STALE_THRESHOLD_MIN AND temperature
- *     present) -> arithmetic mean + badge "Ø 2 stanice"; displayed age is the
- *     OLDER of the two measurements (honest staleness). The average is a
- *     spatial estimate for Olomouc — NEVER described as a "more accurate
- *     measurement" (F2.5 wording rule).
+ *     present) -> average WEIGHTED BY FRESHNESS (round 3, Pavel 23. 9.:
+ *     w = 1/(age_min + 15) — the fresher station pulls the result towards
+ *     itself) + badge "Ø 2 stanice"; displayed age is the OLDER of the two
+ *     measurements (honest staleness). The average is a spatial estimate for
+ *     Olomouc — NEVER described as a "more accurate measurement" (F2.5
+ *     wording rule). The formula is disclosed in the app (transparency).
  *  2. OTHERWISE the PRIMARY station (Infopocasi) always wins as long as it
  *     has any temperature — even a stale one (Pavel: "jinak jede vlevo
  *     infopocasi"); its staleness is shown honestly (F2.4/G6).
@@ -53,6 +55,16 @@ object WidgetSynthesis {
 
     private val STALE_MS = Sources.STALE_THRESHOLD_MIN * 60_000L
 
+    /**
+     * Freshness weight (round 3, Pavel 23. 9.): w = 1/(age_min + 15).
+     * The +15 min offset keeps weights finite and bounded (a "just now"
+     * measurement weighs 1/15, a 30-min-old one 1/45 — 3x less, never zero).
+     * Disclosed in the app (transparency).
+     */
+    const val WEIGHT_OFFSET_MIN = 15f
+
+    fun weight(ageMin: Float): Float = 1f / (ageMin + WEIGHT_OFFSET_MIN)
+
     fun synthesize(measurements: Map<String, StationMeasurement>, nowMs: Long): WidgetState {
         val usable = measurements.values.filter {
             it.temperatureC != null && nowMs - it.measuredAtMs <= STALE_MS
@@ -60,9 +72,13 @@ object WidgetSynthesis {
 
         return when {
             usable.size >= 2 -> {
-                val avg = usable.map { it.temperatureC!! }.average().toFloat()
+                val weights = usable.map { weight((nowMs - it.measuredAtMs) / 60_000f) }
+                val weighted = usable
+                    .map { it.temperatureC!! }
+                    .zip(weights) { t, w -> t * w }
+                    .sum() / weights.sum()
                 WidgetState(
-                    temperatureC = avg,
+                    temperatureC = weighted,
                     badge = "Ø 2 stanice",
                     measuredAtMs = usable.minOf { it.measuredAtMs },
                     status = WidgetStatus.OK,

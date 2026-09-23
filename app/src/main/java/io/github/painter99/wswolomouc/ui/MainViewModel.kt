@@ -39,15 +39,15 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            // Cache-first (NF3; round 6 ANR fix, Pavel 23. 9.): show the last
-            // known values IMMEDIATELY — the startup spinner must never wait
-            // for the network (10 s timeouts made the app look frozen).
+            // Cache-first (NF3; round 6): show the last known values
+            // IMMEDIATELY — the startup spinner must never wait for the
+            // network (10 s timeouts made the app look frozen).
             val cached = repository.latestFromCache()
+            val now0 = clock()
             _uiState.value = if (cached.isNotEmpty()) {
-                val now = clock()
                 val freshness = if (
                     cached.values.all {
-                        now - it.measuredAtMs <= Sources.STALE_THRESHOLD_MIN * 60_000
+                        now0 - it.measuredAtMs <= Sources.STALE_THRESHOLD_MIN * 60_000
                     }
                 ) {
                     WeatherRepository.Freshness.FRESH
@@ -56,7 +56,7 @@ class MainViewModel @Inject constructor(
                 }
                 MainUiStateMapper.from(
                     WeatherRepository.Snapshot(freshness = freshness, measurements = cached),
-                    now
+                    now0
                 )
             } else {
                 // First launch, nothing cached: placeholders, no spinner.
@@ -66,7 +66,14 @@ class MainViewModel @Inject constructor(
                     secondary = MainUiStateMapper.placeholder(Sources.STATION_CHMU)
                 )
             }
-            refresh()
+            // Round 7 fix (Pavel 23. 9.): when the newest cached measurement
+            // is fresher than the rate limit, do NOT touch the network on
+            // startup — opening the app must not burn the 10-min manual
+            // refresh budget (the "limit za 10 min" right after opening).
+            val newestCachedAt = cached.values.maxOfOrNull { it.measuredAtMs } ?: 0L
+            if (now0 - newestCachedAt >= Sources.FETCH_RATE_LIMIT_MS) {
+                refresh()
+            }
         }
     }
 
@@ -80,7 +87,13 @@ class MainViewModel @Inject constructor(
                     ?.takeIf { it > nowMs }
                     ?.let {
                         val minutes = ceil((it - nowMs) / 60_000.0).toInt()
-                        "Limit aktualizací – zkuste znovu za $minutes min"
+                        // Round 7 fix (Pavel 23. 9.): the message must be
+                        // HONEST — say how old the shown data is, not just
+                        // "wait 10 min" while the data is 4 minutes fresh.
+                        val dataAgeMin = snapshot.measurements.values
+                            .maxOfOrNull { m -> (nowMs - m.measuredAtMs) / 60_000 }
+                            ?.toInt() ?: 0
+                        "Data před $dataAgeMin min – další aktualizace za $minutes min"
                     }
             } else {
                 null

@@ -36,6 +36,8 @@ import io.github.painter99.wswolomouc.MainActivity
 import io.github.painter99.wswolomouc.data.WeatherRepository
 import io.github.painter99.wswolomouc.ui.Format
 import io.github.painter99.wswolomouc.ui.RelativeTimeFormatter
+import io.github.painter99.wswolomouc.ui.Trend
+import io.github.painter99.wswolomouc.ui.TrendDirection
 
 /**
  * Home-screen widget 4×2/5×2 (M1.6a + M1.6b-2 v2, PRD F2.1/F2.2/F2.4/F2.6).
@@ -67,11 +69,23 @@ class WswWidget : GlanceAppWidget() {
 
         // Cache-first read only — no network from the widget (M1.6a).
         val snapshot = repository.latestFromCache()
+        val nowMs = System.currentTimeMillis()
+
+        // ONE trend arrow (3 h window) for the station behind the badge
+        // (Pavel 23. 9.). Computed here because it needs Room history; the
+        // layout itself stays a pure function.
+        val synth = WidgetSynthesis.synthesize(snapshot, nowMs)
+        val trend = synth.sourceStation?.let {
+            Trend.compute(
+                synth.temperatureC,
+                repository.pastTemperature(it, nowMs - Trend.WIDGET_WINDOW_MS)
+            )
+        }
 
         provideContent {
             val wide = LocalSize.current.width >= 400.dp
-            val layout = WidgetLayout.build(snapshot, System.currentTimeMillis(), wide)
-            WidgetContent(layout, nowMs = System.currentTimeMillis())
+            val layout = WidgetLayout.build(snapshot, nowMs, wide, trend)
+            WidgetContent(layout, nowMs = nowMs)
         }
     }
 }
@@ -128,7 +142,8 @@ fun WidgetContent(layout: WidgetLayoutState, nowMs: Long) {
             )
             Spacer(modifier = GlanceModifier.height(2.dp))
             Text(
-                text = Format.temperaturePrecise(layout.left.temperatureC),
+                text = Format.temperaturePrecise(layout.left.temperatureC) +
+                    Trend.arrow(layout.left.trend),
                 style = textStyle(40, bold = true)
             )
             Text(

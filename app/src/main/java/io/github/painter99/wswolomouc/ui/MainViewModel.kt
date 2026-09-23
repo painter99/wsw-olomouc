@@ -3,7 +3,10 @@ package io.github.painter99.wswolomouc.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.painter99.wswolomouc.Sources
 import io.github.painter99.wswolomouc.data.WeatherRepository
+import io.github.painter99.wswolomouc.ui.Trend
+import io.github.painter99.wswolomouc.ui.TrendItem
 import javax.inject.Inject
 import kotlin.math.ceil
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +49,26 @@ class MainViewModel @Inject constructor(
             }
             _uiState.value = MainUiStateMapper.from(snapshot, nowMs).copy(
                 isRefreshing = false,
-                rateLimitMessage = rateLimitMessage
+                rateLimitMessage = rateLimitMessage,
+                trends = trendItems(snapshot, nowMs)
+            )
+        }
+    }
+
+    /** Trend arrows for the primary station (1 h / 3 h / 6 h, Pavel 23. 9.). */
+    private suspend fun trendItems(
+        snapshot: WeatherRepository.Snapshot,
+        nowMs: Long
+    ): List<TrendItem> {
+        val primary = snapshot.measurements[Sources.STATION_INFOPOCASI] ?: return emptyList()
+        val current = primary.temperatureC ?: return emptyList()
+        return Trend.APP_WINDOWS_MS.map { (windowMs, label) ->
+            TrendItem(
+                label,
+                Trend.compute(
+                    current,
+                    repository.pastTemperature(primary.station, nowMs - windowMs)
+                )
             )
         }
     }

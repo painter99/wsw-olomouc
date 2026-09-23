@@ -4,6 +4,7 @@ import io.github.painter99.wswolomouc.Sources
 import io.github.painter99.wswolomouc.data.StationMeasurement
 import io.github.painter99.wswolomouc.ui.FeelsLike
 import io.github.painter99.wswolomouc.ui.Format
+import io.github.painter99.wswolomouc.ui.TrendDirection
 
 /** One secondary-row entry (PRD F2.6/NF8): label + preformatted value. */
 data class SecondaryItem(val label: String, val text: String)
@@ -61,9 +62,10 @@ object WidgetLayout {
     fun build(
         measurements: Map<String, StationMeasurement>,
         nowMs: Long,
-        wide: Boolean
+        wide: Boolean,
+        trend: TrendDirection? = null
     ): WidgetLayoutState {
-        val left = WidgetSynthesis.synthesize(measurements, nowMs)
+        val left = WidgetSynthesis.synthesize(measurements, nowMs).copy(trend = trend)
 
         val source = left.sourceStation?.let { measurements[it] }
         val secondary = source?.let { secondaryItems(it) } ?: emptyList()

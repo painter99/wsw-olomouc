@@ -1,10 +1,14 @@
 package io.github.painter99.wswolomouc
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -115,6 +119,12 @@ fun MainContent(state: MainUiState, nowMs: Long, onRefresh: () -> Unit) {
     ) {
         StatusRow(state, nowMs)
         state.primary?.let { StationCard(it, nowMs, isPrimary = true) }
+        if (state.trends.isNotEmpty()) {
+            Text(
+                text = "Trend: " + state.trends.joinToString(" · ") { it.text },
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
         state.secondary?.let { StationCard(it, nowMs, isPrimary = false) }
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onRefresh, enabled = !state.isRefreshing) {
@@ -128,6 +138,7 @@ fun MainContent(state: MainUiState, nowMs: Long, onRefresh: () -> Unit) {
         state.rateLimitMessage?.let {
             Text(it, style = MaterialTheme.typography.bodySmall)
         }
+        SourceLinks()
     }
 }
 
@@ -240,4 +251,43 @@ fun StationCard(s: StationUi, nowMs: Long, isPrimary: Boolean) {
             }
         }
     }
+}
+
+/**
+ * M1.7-trend (Pavel 23. 9.): visible, clickable links to the OFFICIAL pages
+ * of both data sources, licenses visible "podle standardů" (F5.4 extended).
+ * Station identity per Pavel: the station operator = infopocasi-olomouc.cz (do NOT
+ * conflate with the in-pocasi.cz aggregator).
+ */
+@Composable
+fun SourceLinks() {
+    val context = LocalContext.current
+    Column {
+        Text(
+            text = "Zdroje dat",
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+        LinkText(
+            "infopocasi-olomouc.cz — data se souhlasem provozovatele",
+            Sources.INFOPOCASI_WEB,
+            context
+        )
+        LinkText("ČHMÚ Olomouc–Holice — otevřená data", Sources.CHMU_WEB, context)
+        LinkText("ČHMÚ — licence CC BY 4.0", Sources.CHMU_LICENSE_URL, context)
+    }
+}
+
+@Composable
+private fun LinkText(label: String, url: String, context: Context) {
+    Text(
+        text = label,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier
+            .padding(top = 2.dp)
+            .clickable {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            }
+    )
 }

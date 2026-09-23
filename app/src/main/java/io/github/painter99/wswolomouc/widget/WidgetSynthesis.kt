@@ -2,17 +2,22 @@ package io.github.painter99.wswolomouc.widget
 
 import io.github.painter99.wswolomouc.Sources
 import io.github.painter99.wswolomouc.data.StationMeasurement
+import io.github.painter99.wswolomouc.ui.TrendDirection
 
 /** Widget display state (PRD F2.4): OK / STÁRÉ DATA / OFFLINE. */
 enum class WidgetStatus { OK, STALE, OFFLINE }
 
 /**
- * Synthesized widget state (M1.6a, PRD F2.5).
+ * Synthesized widget state (M1.6a, PRD F2.5; revised by Pavel 23. 9. 2026).
  *
  * [badge] names the data source: "Ø 2 stanice" when both fresh stations were
  * averaged, otherwise the short name of the single station the value comes
  * from. The average is a spatial estimate for Olomouc — NEVER described as a
  * "more accurate measurement" (F2.5 wording rule).
+ *
+ * [trend] is the arrow of the DISPLAYED value (3 h window), set by the
+ * caller from Room history — the synthesis itself stays a pure
+ * map -> state function.
  */
 data class WidgetState(
     val temperatureC: Float?,
@@ -21,24 +26,27 @@ data class WidgetState(
     val measuredAtMs: Long?,
     val status: WidgetStatus,
     /**
-     * Station the DISPLAYED value comes from (M1.6b-2): the averaged primary
-     * station for the "Ø 2 stanice" badge (F2.5: non-temperature values come
-     * from the primary), the single station's id otherwise, null when OFFLINE.
+     * Station the DISPLAYED value comes from: the primary station for the
+     * "Ø 2 stanice" badge (F2.5: non-temperature values come from the
+     * primary), the single station's id otherwise, null when OFFLINE.
      */
-    val sourceStation: String? = null
+    val sourceStation: String? = null,
+    val trend: TrendDirection? = null
 )
 
 /**
- * Pure synthesis rules (PRD F2.5), unit-tested in WidgetSynthesisTest:
+ * Pure synthesis rules (PRD F2.5 as revised by Pavel 23. 9. 2026), tested in
+ * WidgetSynthesisTest:
  *
  *  1. Both stations usable (fresh <= STALE_THRESHOLD_MIN AND temperature
  *     present) -> arithmetic mean + badge "Ø 2 stanice"; displayed age is the
- *     OLDER of the two measurements (honest staleness).
- *  2. Exactly one usable -> its value + its badge.
- *  3. No usable station but some data exists -> newest available value,
- *     status STALE (F2.4 "STÁRÉ DATA"; the PRD's "both old -> OFFLINE" is
- *     realized as not-OK: the widget keeps showing the last known value with
- *     its age per G6, and the gray/orange dot makes the state explicit).
+ *     OLDER of the two measurements (honest staleness). The average is a
+ *     spatial estimate for Olomouc — NEVER described as a "more accurate
+ *     measurement" (F2.5 wording rule).
+ *  2. OTHERWISE the PRIMARY station (Infopocasi) always wins as long as it
+ *     has any temperature — even a stale one (Pavel: "jinak jede vlevo
+ *     infopocasi"); its staleness is shown honestly (F2.4/G6).
+ *  3. Only when the primary has no temperature -> newest available value.
  *  4. No data at all -> OFFLINE, no value (G6).
  */
 object WidgetSynthesis {
@@ -62,33 +70,33 @@ object WidgetSynthesis {
                     sourceStation = Sources.STATION_INFOPOCASI
                 )
             }
-            usable.size == 1 -> {
-                val m = usable.single()
-                WidgetState(
-                    temperatureC = m.temperatureC,
-                    badge = shortName(m.station),
-                    measuredAtMs = m.measuredAtMs,
-                    status = WidgetStatus.OK,
-                    sourceStation = m.station
-                )
+            else -> {
+                val primary = measurements[Sources.STATION_INFOPOCASI]
+                    ?.takeIf { it.temperatureC != null }
+                val chosen = primary
+                    ?: measurements.values
+                        .filter { it.temperatureC != null }
+                        .maxByOrNull { it.measuredAtMs }
+                when (chosen) {
+                    null -> WidgetState(
+                        temperatureC = null,
+                        badge = "—",
+                        measuredAtMs = null,
+                        status = WidgetStatus.OFFLINE
+                    )
+                    else -> WidgetState(
+                        temperatureC = chosen.temperatureC,
+                        badge = shortName(chosen.station),
+                        measuredAtMs = chosen.measuredAtMs,
+                        status = if (nowMs - chosen.measuredAtMs <= STALE_MS) {
+                            WidgetStatus.OK
+                        } else {
+                            WidgetStatus.STALE
+                        },
+                        sourceStation = chosen.station
+                    )
+                }
             }
-            measurements.isNotEmpty() -> {
-                val newest = measurements.values.maxBy { it.measuredAtMs }
-                val fresh = nowMs - newest.measuredAtMs <= STALE_MS
-                WidgetState(
-                    temperatureC = newest.temperatureC,
-                    badge = shortName(newest.station),
-                    measuredAtMs = newest.measuredAtMs,
-                    status = if (fresh) WidgetStatus.OK else WidgetStatus.STALE,
-                    sourceStation = newest.station
-                )
-            }
-            else -> WidgetState(
-                temperatureC = null,
-                badge = "—",
-                measuredAtMs = null,
-                status = WidgetStatus.OFFLINE
-            )
         }
     }
 

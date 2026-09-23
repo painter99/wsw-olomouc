@@ -38,6 +38,9 @@ class MainViewModelTest {
         override suspend fun insert(m: MeasurementEntity): Long { rows.add(m); return rows.size.toLong() }
         override suspend fun latestForStation(station: String): MeasurementEntity? =
             rows.filter { it.station == station }.maxByOrNull { it.measuredAt }
+        override suspend fun latestBefore(station: String, beforeEpochMs: Long): MeasurementEntity? =
+            rows.filter { it.station == station && it.measuredAt <= beforeEpochMs }
+                .maxByOrNull { it.measuredAt }
         override suspend fun since(fromEpochMs: Long): List<MeasurementEntity> =
             rows.filter { it.measuredAt >= fromEpochMs }.sortedBy { it.measuredAt }
         override suspend fun deleteFetchedBefore(beforeEpochMs: Long): Int {
@@ -163,5 +166,29 @@ class MainViewModelTest {
 
         assertTrue("was ${state.rateLimitMessage}", state.rateLimitMessage != null)
         assertTrue("was ${state.rateLimitMessage}", state.rateLimitMessage!!.contains("min"))
+    }
+
+    // --- M1.7-trend: app trend arrows -----------------------------------------
+
+    @Test
+    fun trends_computedForPrimary_fromRoomHistory() = runTest {
+        val hour = 3_600_000L
+        val dao = FakeDao()
+        dao.insert(
+            measurement(Sources.STATION_INFOPOCASI, now - 7 * hour).copy(temperatureC = 20f).toEntity()
+        )
+        dao.insert(
+            measurement(Sources.STATION_INFOPOCASI, now - 3 * hour - 30 * 60_000L)
+                .copy(temperatureC = 10f).toEntity()
+        )
+        val vm = viewModel(dao = dao, primary = measurement(Sources.STATION_INFOPOCASI))
+        val state = awaitLoaded(vm)
+
+        assertEquals(listOf("1 h", "3 h", "6 h"), state.trends.map { it.label })
+        // 15 °C now vs 10 °C 3.5 h ago -> rising for the 1 h and 3 h windows;
+        // vs 20 °C 7 h ago -> falling for the 6 h window.
+        assertEquals(TrendDirection.RISING, state.trends[0].direction)
+        assertEquals(TrendDirection.RISING, state.trends[1].direction)
+        assertEquals(TrendDirection.FALLING, state.trends[2].direction)
     }
 }

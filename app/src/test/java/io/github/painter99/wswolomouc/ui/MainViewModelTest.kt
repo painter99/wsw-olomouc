@@ -57,7 +57,11 @@ class MainViewModelTest {
         override val id: String,
         private val result: StationMeasurement?
     ) : StationDataSource {
-        override suspend fun fetch(): StationMeasurement? = result
+        var fetchCount = 0
+        override suspend fun fetch(): StationMeasurement? {
+            fetchCount++
+            return result
+        }
     }
 
     // --- helpers ------------------------------------------------------------
@@ -136,17 +140,71 @@ class MainViewModelTest {
     }
 
     @Test
-    fun sourcesFail_withCache_offlineStillServesLatestValues() = runTest {
+    fun sourcesFail_withCache_freshCacheServedWithoutNetwork() = runTest {
         val dao = FakeDao()
         dao.insert(measurement(Sources.STATION_INFOPOCASI).toEntity())
         val state = awaitLoaded(viewModel(dao = dao))
 
+        // Round 6 fix (Pavel 23. 9.): fresh cache (< 10 min) must NOT trigger
+        // a network refresh on startup — opening the app must not burn the
+        // 10-min manual-refresh budget. Fresh data = FRESH, not OFFLINE.
+        assertEquals(WeatherRepository.Freshness.FRESH, state.freshness)
+        assertEquals(Sources.STATION_INFOPOCASI, state.primary?.station)
+        assertEquals(true, state.primary?.hasData)
+        assertEquals(Sources.STATION_CHMU, state.secondary?.station)
+        assertEquals(false, state.secondary?.hasData)
+    }
+
+    @Test
+    fun sourcesFail_withStaleCache_offlineStillServesLatestValues() = runTest {
+        val dao = FakeDao()
+        dao.insert(measurement(Sources.STATION_INFOPOCASI, now - 45 * 60_000L).toEntity())
+        val state = awaitLoaded(viewModel(dao = dao))
+
+        // G6 unchanged: stale cache + failing sources = OFFLINE, but the last
+        // known values are still served.
         assertEquals(WeatherRepository.Freshness.OFFLINE, state.freshness)
         assertEquals(Sources.STATION_INFOPOCASI, state.primary?.station)
         assertEquals(true, state.primary?.hasData)
-        // M1.6a.1: CHMU has no data -> placeholder, not null.
         assertEquals(Sources.STATION_CHMU, state.secondary?.station)
         assertEquals(false, state.secondary?.hasData)
+    }
+
+    @Test
+    fun startup_freshCache_skipsNetworkRefresh() = runTest {
+        val dao = FakeDao()
+        dao.insert(measurement(Sources.STATION_INFOPOCASI, now - 4 * 60_000L).toEntity())
+        val primary = FakeSource(Sources.STATION_INFOPOCASI, measurement(Sources.STATION_INFOPOCASI))
+        val repo = WeatherRepository(
+            listOf(primary, FakeSource(Sources.STATION_CHMU, null)), dao, clock = { now }
+        )
+        val vm = MainViewModel(repo, FakeThemeStore(), clock = { now })
+        awaitLoaded(vm)
+
+        assertEquals(0, primary.fetchCount)
+    }
+
+    @Test
+    fun refresh_rateLimited_messageShowsDataAgeAndRemaining() = runTest {
+        val dao = FakeDao()
+        dao.insert(measurement(Sources.STATION_INFOPOCASI, now - 4 * 60_000L).toEntity())
+        val primary = FakeSource(
+            Sources.STATION_INFOPOCASI, measurement(Sources.STATION_INFOPOCASI, now - 4 * 60_000L)
+        )
+        val repo = WeatherRepository(
+            listOf(primary, FakeSource(Sources.STATION_CHMU, null)), dao, clock = { now }
+        )
+        val vm = MainViewModel(repo, FakeThemeStore(), clock = { now })
+        awaitLoaded(vm)      // init: fresh cache -> no network
+        vm.refresh()         // manual #1: fetches (data age 4 min)
+        vm.refresh()         // manual #2: rate limited
+
+        val state = awaitLoaded(vm)
+        val msg = state.rateLimitMessage!!
+        // Round 6 fix (Pavel 23. 9.): the message must be HONEST — it must
+        // say how old the shown data is, not just "wait 10 min".
+        assertTrue("was: $msg", msg.contains("před 4 min"))
+        assertTrue("was: $msg", msg.contains("za"))
     }
 
     // --- M1.6b-3: refresh feedback -------------------------------------------

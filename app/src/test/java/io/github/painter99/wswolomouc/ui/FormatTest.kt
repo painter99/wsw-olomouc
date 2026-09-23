@@ -47,4 +47,13 @@ class FormatTest {
         assertEquals("0,0 mm", Format.rain(0f))
         assertEquals("—", Format.rain(null))
     }
+
+    @Test
+    fun windRange_windAndGust_singleUnit() {
+        // Pavel 23. 9. (round 2): gusts joined into the wind item on the
+        // widget — "Vítr 11–18 km/h" keeps the secondary row at 3 items (NF8).
+        assertEquals("11–18 km/h", Format.windRange(3.0f, 5.0f))
+        assertEquals("11 km/h", Format.windRange(3.0f, null))
+        assertEquals("—", Format.windRange(null, 5.0f))
+    }
 }

@@ -10,6 +10,9 @@ import io.github.painter99.wswolomouc.db.MeasurementEntity
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -77,7 +80,8 @@ class MainViewModelTest {
     private fun viewModel(
         dao: MeasurementDao = FakeDao(),
         primary: StationMeasurement? = null,
-        secondary: StationMeasurement? = null
+        secondary: StationMeasurement? = null,
+        themeStore: ThemeStore = FakeThemeStore()
     ): MainViewModel {
         val repo = WeatherRepository(
             sources = listOf(
@@ -87,7 +91,13 @@ class MainViewModelTest {
             dao = dao,
             clock = { now }
         )
-        return MainViewModel(repo, clock = { now })
+        return MainViewModel(repo, themeStore, clock = { now })
+    }
+
+    private class FakeThemeStore : ThemeStore {
+        private val flow = MutableStateFlow(ThemeMode.SYSTEM)
+        override val mode: Flow<ThemeMode> = flow
+        override suspend fun set(mode: ThemeMode) { flow.value = mode }
     }
 
     /** The repository refresh runs on Dispatchers.IO — wait for it in real time. */
@@ -190,5 +200,35 @@ class MainViewModelTest {
         assertEquals(TrendDirection.RISING, state.trends[0].direction)
         assertEquals(TrendDirection.RISING, state.trends[1].direction)
         assertEquals(TrendDirection.FALLING, state.trends[2].direction)
+    }
+
+    // --- round 2: trend windows without history are hidden --------------------
+
+    @Test
+    fun trends_windowsWithoutHistory_areHidden() = runTest {
+        val dao = FakeDao()
+        dao.insert(
+            measurement(Sources.STATION_INFOPOCASI, now - 2 * 3_600_000L)
+                .copy(temperatureC = 10f).toEntity()
+        )
+        val vm = viewModel(dao = dao, primary = measurement(Sources.STATION_INFOPOCASI))
+        val state = awaitLoaded(vm)
+
+        // Only the 1 h window has a past row (2 h old); 3 h / 6 h are hidden
+        // instead of showing "–" (Pavel 23. 9., round 2: "jen okna, kde
+        // už historie je").
+        assertEquals(listOf("1 h"), state.trends.map { it.label })
+        assertEquals(TrendDirection.RISING, state.trends[0].direction)
+    }
+
+    // --- round 2: theme setting ------------------------------------------------
+
+    @Test
+    fun themeMode_exposesStoreFlow_andSetThemePersists() = runTest {
+        val store = FakeThemeStore()
+        val vm = viewModel(themeStore = store)
+        assertEquals(ThemeMode.SYSTEM, vm.themeMode.first())
+        vm.setTheme(ThemeMode.DARK)
+        assertEquals(ThemeMode.DARK, vm.themeMode.first())
     }
 }

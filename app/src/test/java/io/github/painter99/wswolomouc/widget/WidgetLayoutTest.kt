@@ -34,6 +34,7 @@ class WidgetLayoutTest {
         ageMin: Long,
         humidityPct: Int? = 60,
         windMs: Float? = null,
+        windGustMs: Float? = null,
         rainMm: Float? = null,
         rainDailyMm: Float? = null
     ): StationMeasurement = StationMeasurement(
@@ -42,7 +43,7 @@ class WidgetLayoutTest {
         humidityPct = humidityPct,
         pressureHpa = null,
         windMs = windMs,
-        windGustMs = null,
+        windGustMs = windGustMs,
         windDirDeg = null,
         rainMm = rainMm,
         rainDailyMm = rainDailyMm,
@@ -64,7 +65,7 @@ class WidgetLayoutTest {
     }
 
     @Test
-    fun bothFresh_leftAverage_secondaryFromPrimary() {
+    fun bothFresh_secondaryAlsoWeightedByFreshness() {
         val s = build(
             infopocasi = measurement(
                 Sources.STATION_INFOPOCASI, 21.0f, 5, windMs = 3.0f, rainDailyMm = 0.5f
@@ -78,11 +79,35 @@ class WidgetLayoutTest {
         assertEquals(WidgetStatus.OK, s.left.status)
         assertEquals(Sources.STATION_INFOPOCASI, s.left.sourceStation)
         assertEquals(now - 10 * minute, s.left.measuredAtMs) // honest age = older
-        // Secondary row from the PRIMARY station (F2.5: synthesis is temp only)
+        // Round 6 (Pavel 23. 9.): the secondary row is ALSO freshness-weighted
+        // (w = 1/(age+15)), not just the primary station's values:
+        // wind (3*1/20 + 4*1/25)/0.09 = 3.44 m/s -> 12 km/h,
+        // rain (0.5*1/20 + 0.2*1/25)/0.09 = 0.37 mm -> "0,4 mm (den)",
+        // feels-like from the averaged T/wind/RH -> 21,9 °C (T > 10 °C domain).
         assertEquals(listOf("Pocitová", "Vítr", "Srážky"), s.secondary.map { it.label })
-        assertEquals("21,0 °C", s.secondary[0].text)  // one decimal (Pavel 22. 9.)
-        assertEquals("11 km/h", s.secondary[1].text)  // 3.0 m/s -> ONCE to km/h
-        assertEquals("0,5 mm (den)", s.secondary[2].text) // daily, BOTH sources
+        assertEquals("21,9 °C", s.secondary[0].text)
+        assertEquals("12 km/h", s.secondary[1].text)
+        assertEquals("0,4 mm (den)", s.secondary[2].text)
+    }
+
+    @Test
+    fun bothFresh_windGustRain_weightedToo() {
+        val s = build(
+            infopocasi = measurement(
+                Sources.STATION_INFOPOCASI, 14.0f, 2,
+                windMs = 2.0f, windGustMs = 3.0f, rainDailyMm = 1.0f
+            ),
+            chmu = measurement(
+                Sources.STATION_CHMU, 16.0f, 28,
+                windMs = 6.0f, windGustMs = 9.0f, rainDailyMm = 0.0f
+            )
+        )
+        // weights: 1/17 (Infopocasi, 2 min) vs 1/43 (CHMU, 28 min)
+        // wind  -> 3.13 m/s -> 11 km/h; gust -> 4.70 m/s -> 17 km/h
+        // rain  -> 0.72 mm -> "0,7 mm (den)"; feels-like = averaged T (14,6 °C)
+        assertEquals("14,6 °C", s.secondary[0].text)
+        assertEquals("11–17 km/h", s.secondary[1].text)
+        assertEquals("0,7 mm (den)", s.secondary[2].text)
     }
 
     @Test

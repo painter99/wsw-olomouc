@@ -186,7 +186,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun refresh_rateLimited_messageShowsDataAgeAndRemaining() = runTest {
+    fun refresh_rateLimited_secondTapShowsWaitTimeOnly() = runTest {
         val dao = FakeDao()
         dao.insert(measurement(Sources.STATION_INFOPOCASI, now - 4 * 60_000L).toEntity())
         val primary = FakeSource(
@@ -203,10 +203,12 @@ class MainViewModelTest {
 
         val state = awaitLoaded(vm)
         val msg = state.rateLimitMessage!!
-        // Round 6 fix (Pavel 23. 9.): the message must be HONEST — it must
-        // say how old the shown data is, not just "wait 10 min".
-        assertTrue("was: $msg", msg.contains("před 4 min"))
+        // 24. 9. 2026: the message says the tap was SKIPPED and when the
+        // next manual refresh is allowed. The data age is NOT part of it
+        // anymore — the station cards right above already show it.
+        assertTrue("was: $msg", msg.contains("přeskočena"))
         assertTrue("was: $msg", msg.contains("za"))
+        assertFalse("was: $msg", msg.contains("před"))
     }
 
     // --- M1.6b-3: refresh feedback -------------------------------------------

@@ -240,9 +240,10 @@ class MainViewModelTest {
 
     @Test
     fun refresh_rateLimited_messageSaysUpdateWasSkipped() = runTest {
-        // Pavel 24. 9. 2026: tapping "Aktualizovat" within the rate limit
-        // must NOT read like a completed update ("Data pred 2 min - dalsi za
-        // 10 min") — the message must say the tap was SKIPPED.
+        // 24. 9. 2026: tapping "Aktualizovat" within the rate limit must NOT
+        // read like a completed update — the message must say the tap was
+        // SKIPPED. The data age is NOT part of this message anymore (it is
+        // visible in the station cards right above) — only the wait time.
         val vm = viewModel(
             primary = measurement(Sources.STATION_INFOPOCASI),
             secondary = measurement(Sources.STATION_CHMU)
@@ -255,6 +256,7 @@ class MainViewModelTest {
         val msg = state.rateLimitMessage!!
         assertTrue("was: $msg", msg.contains("přeskočena"))
         assertTrue("was: $msg", msg.contains("min"))
+        assertFalse("was: $msg", msg.contains("data před"))
     }
 
     // --- M1.7-trend: app trend arrows -----------------------------------------

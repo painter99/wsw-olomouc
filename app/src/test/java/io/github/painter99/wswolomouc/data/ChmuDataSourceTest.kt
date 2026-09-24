@@ -69,6 +69,8 @@ class ChmuDataSourceTest {
 
     @Test
     fun fetch_http404_returnsNull() = runTest {
+        // 404 on today's file AND yesterday's fallback file.
+        server.enqueue(MockResponse().setResponseCode(404))
         server.enqueue(MockResponse().setResponseCode(404))
         assertNull(dataSource().fetch())
     }
@@ -93,6 +95,8 @@ class ChmuDataSourceTest {
 
     @Test
     fun fetchResult_http404_reportsHttpErrorWithCode() = runTest {
+        // 404 on today's file AND yesterday's fallback file.
+        server.enqueue(MockResponse().setResponseCode(404))
         server.enqueue(MockResponse().setResponseCode(404))
 
         val r = dataSource().fetchResult()
@@ -143,9 +147,10 @@ class ChmuDataSourceTest {
     }
 
     @Test
-    fun fetch_requestsUtcDailyFile_notLocalZone() = runTest {
-        // CHMU names daily files by the UTC date (rows are UTC "Z"), not the
-        // Prague date. A UTC-11 zone must NOT leak into the file name.
+    fun fetch_requestsUtcDailyFile() = runTest {
+        // CHMU names daily files by the UTC date (rows are UTC "Z"), never
+        // by a local zone — the old Europe/Prague name caused a guaranteed
+        // nightly 404 between local midnight and ~02:00 (M1.7b, Pavel 24. 9.).
         server.enqueue(MockResponse().setBody(fixture()))
         val ds = ChmuDataSource(
             client = OkHttpClient(),
@@ -153,11 +158,9 @@ class ChmuDataSourceTest {
                 requestedDates.add(dateCompact)
                 server.url("/10m-$dateCompact.json").toString()
             },
-            zone = java.time.ZoneId.of("Pacific/Pago_Pago")
+            todayUtc = { java.time.LocalDate.of(2026, 9, 24) }
         )
         ds.fetch()
-        val expected = java.time.LocalDate.now(java.time.ZoneOffset.UTC)
-            .format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE)
-        assertEquals("file name must use the UTC date", expected, requestedDates.single())
+        assertEquals("20260924", requestedDates.single())
     }
 }

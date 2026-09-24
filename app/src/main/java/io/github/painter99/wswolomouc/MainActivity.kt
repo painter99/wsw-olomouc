@@ -202,24 +202,41 @@ fun MainContent(
             )
         }
         if (detailsExpanded) {
-            Text(
-                text = "Aplikace kombinuje data ze dvou stanic. Hlavní " +
-                    "zdroj dat v aplikaci je Infopocasi v Neředíně, měří " +
-                    "zhruba každou minutu, takže zobrazené hodnoty bývají " +
-                    "čerstvé. Druhou stanici provozuje ČHMÚ v Holici. " +
-                    "Měří každých 10 minut a data se v otevřených datech " +
-                    "objevují přibližně po 10–15 minutách — v aplikaci " +
-                    "proto slouží hlavně k porovnání a jako záloha. " +
-                    "Konečnou teplotu, " +
-                    "vítr, poryvy, srážky i pocitovou teplotu na widgetu " +
-                    "počítá aplikace jako průměr obou stanic vážený " +
-                    "čerstvostí — čerstvější měření má větší váhu " +
-                    "(váha = 1/(stáří + 15 min)). V případě, kdy jsou data " +
-                    "ze stanice ČHMÚ starší než 30 minut, widget " +
-                    "nezobrazuje průměr obou stanic, ale pouze data " +
-                    "z Infopocasi.",
-                style = MaterialTheme.typography.bodySmall
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Aplikace využívá data ze dvou meteorologických " +
+                        "stanic. Hlavním zdrojem je stanice Infopocasi " +
+                        "v Neředíně, která měří přibližně každou minutu, " +
+                        "takže její údaje bývají velmi aktuální.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = "Doplňkově aplikace využívá stanici ČHMÚ " +
+                        "v Holici. Ta měří v desetiminutových intervalech, " +
+                        "ale otevřená data, ze kterých aplikace čerpá, se " +
+                        "zveřejňují jen zhruba jednou za hodinu. Slouží " +
+                        "proto především k porovnání a jako záložní zdroj.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = "Teplotu, rychlost větru, nárazy větru, srážky " +
+                        "a pocitovou teplotu zobrazené na widgetu aplikace " +
+                        "vypočítává z údajů obou stanic. Novější měření má " +
+                        "při výpočtu větší váhu než starší — váha se určuje " +
+                        "podle stáří měření vzorcem 1/(stáří + 15 minut).",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = "Pokud jsou poslední dostupná data ze stanice " +
+                        "ČHMÚ starší než 30 minut, aplikace průměr obou " +
+                        "stanic nepoužije a widget zobrazí pouze data ze " +
+                        "stanice Infopocasi.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
         // Round 2 (Pavel 23. 9., #5): theme switch, persisted in DataStore.
         Text(

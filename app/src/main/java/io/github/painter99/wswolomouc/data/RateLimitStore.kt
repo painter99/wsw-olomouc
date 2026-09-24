@@ -39,7 +39,11 @@ class DataStoreRateLimitStore(private val context: Context) : RateLimitStore {
 
     override suspend fun loadAll(): Map<String, Long> = try {
         context.rateLimitDataStore.data.first().asMap()
-            .mapKeys { entry -> entry.key.name }
+            // M1.8d (Pavel 24. 9. 2026): strip the storage prefix so the map
+            // is keyed by the SOURCE id the repository looks up. Before this
+            // fix the loaded keys kept "rl_", the lookups missed, and the
+            // 10-min limit silently reset on every process death.
+            .mapKeys { entry -> storeKeyToSource(entry.key.name) }
             .mapValues { entry -> entry.value as? Long ?: 0L }
             .filterValues { value -> value > 0L }
     } catch (e: Exception) {
@@ -56,7 +60,13 @@ class DataStoreRateLimitStore(private val context: Context) : RateLimitStore {
         }
     }
 
-    private companion object {
+    internal companion object {
         const val KEY_PREFIX = "rl_"
+
+        /**
+         * M1.8d: storage key -> source id. Pure function, unit-tested in
+         * RateLimitStoreKeysTest (Prove-It for the process-death bypass).
+         */
+        fun storeKeyToSource(name: String): String = name.removePrefix(KEY_PREFIX)
     }
 }

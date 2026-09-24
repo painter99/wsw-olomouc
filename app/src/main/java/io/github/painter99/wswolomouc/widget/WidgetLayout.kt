@@ -37,7 +37,14 @@ data class WidgetLayoutState(
     val left: WidgetState,
     val secondary: List<SecondaryItem>,
     val stations: List<StationBlock>,
-    val showStationHumidity: Boolean
+    val showStationHumidity: Boolean,
+    /**
+     * M1.8d (Pavel 24. 9. 2026): hide the single "Měření" time on the left
+     * when the value is the average of BOTH stations - one clock time next
+     * to an average of two measurements measured minutes apart is misleading.
+     * Both per-station times stay on the right (honest per-source age).
+     */
+    val showLeftAge: Boolean
 )
 
 /**
@@ -86,7 +93,8 @@ object WidgetLayout {
             left = left,
             secondary = secondary,
             stations = stations,
-            showStationHumidity = wide
+            showStationHumidity = wide,
+            showLeftAge = left.badge != WidgetSynthesis.AVERAGE_BADGE
         )
     }
 

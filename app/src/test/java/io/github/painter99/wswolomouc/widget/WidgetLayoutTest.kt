@@ -79,6 +79,8 @@ class WidgetLayoutTest {
         assertEquals(WidgetStatus.OK, s.left.status)
         assertEquals(Sources.STATION_INFOPOCASI, s.left.sourceStation)
         assertEquals(now - 10 * minute, s.left.measuredAtMs) // honest age = older
+        // M1.8d (Pavel 24. 9.): no single "Měření" time next to the average.
+        assertFalse(s.showLeftAge)
         // Round 6 (Pavel 23. 9.): the secondary row is ALSO freshness-weighted
         // (w = 1/(age+15)), not just the primary station's values:
         // wind (3*1/20 + 4*1/25)/0.09 = 3.44 m/s -> 12 km/h,
@@ -166,6 +168,8 @@ class WidgetLayoutTest {
         // when stale; the fresh CHMU value does NOT override it.
         assertEquals("Infopocasi", s.left.badge)
         assertEquals(Sources.STATION_INFOPOCASI, s.left.sourceStation)
+        // M1.8d (Pavel 24. 9.): single-source value keeps its "Měření" time.
+        assertTrue(s.showLeftAge)
         assertEquals(WidgetStatus.STALE, s.left.status)
         assertEquals("12,0 °C", s.secondary[0].text)
         // Both stations still present; Infopocasi is the stale one.

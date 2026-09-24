@@ -287,4 +287,40 @@ class WeatherRepositoryTest {
         assertEquals(14f, repo.pastTemperature(Sources.STATION_INFOPOCASI, now - 1 * hour)!!, 0.001f)
         assertNull(repo.pastTemperature(Sources.STATION_INFOPOCASI, now - 5 * hour))
     }
+
+    // --- M1.7b: honest freshness (Pavel 24. 9. 2026) -------------------------
+
+    @Test
+    fun refresh_allSkipped_freshCache_freshnessIsFreshNotOffline() = runTest {
+        // Manual refresh while every source is rate limited must NOT report
+        // "Offline" when the served cache is fresh ("Offline · mereni pred
+        // 2 min" made no sense — Pavel 24. 9.).
+        val dao = FakeDao()
+        val primary = FakeSource(
+            Sources.STATION_INFOPOCASI, measurement(Sources.STATION_INFOPOCASI, now)
+        )
+        val repo = WeatherRepository(
+            listOf(primary, FakeSource(Sources.STATION_CHMU, null)), dao, clock = { now }
+        )
+        repo.refresh()
+        val second = repo.refresh() // fixed clock -> every source skipped
+
+        assertTrue(second.skippedByRateLimit)
+        assertEquals(WeatherRepository.Freshness.FRESH, second.freshness)
+    }
+
+    @Test
+    fun refresh_allFail_staleCache_servesStale() = runTest {
+        val dao = FakeDao()
+        dao.insert(measurement(Sources.STATION_INFOPOCASI, now - 2 * 60 * 60_000).toEntity())
+        val repo = WeatherRepository(
+            listOf(FakeSource(Sources.STATION_INFOPOCASI, null), FakeSource(Sources.STATION_CHMU, null)),
+            dao, clock = { now }
+        )
+
+        val snap = repo.refresh()
+
+        assertEquals(WeatherRepository.Freshness.STALE, snap.freshness)
+        assertEquals(1, snap.measurements.size)
+    }
 }

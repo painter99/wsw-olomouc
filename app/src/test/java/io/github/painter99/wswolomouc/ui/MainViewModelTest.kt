@@ -237,6 +237,25 @@ class MainViewModelTest {
         assertTrue("was ${state.rateLimitMessage}", state.rateLimitMessage!!.contains("min"))
     }
 
+    @Test
+    fun refresh_rateLimited_messageSaysUpdateWasSkipped() = runTest {
+        // Pavel 24. 9. 2026: tapping "Aktualizovat" within the rate limit
+        // must NOT read like a completed update ("Data pred 2 min - dalsi za
+        // 10 min") — the message must say the tap was SKIPPED.
+        val vm = viewModel(
+            primary = measurement(Sources.STATION_INFOPOCASI),
+            secondary = measurement(Sources.STATION_CHMU)
+        )
+        awaitLoaded(vm)
+
+        vm.refresh()   // fixed clock -> every source is rate limited
+        val state = awaitLoaded(vm)
+
+        val msg = state.rateLimitMessage!!
+        assertTrue("was: $msg", msg.contains("přeskočena"))
+        assertTrue("was: $msg", msg.contains("min"))
+    }
+
     // --- M1.7-trend: app trend arrows -----------------------------------------
 
     @Test

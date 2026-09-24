@@ -63,6 +63,9 @@ object WidgetSynthesis {
      */
     const val WEIGHT_OFFSET_MIN = 15f
 
+    /** Badge shown when BOTH stations were averaged (M1.8d: named constant). */
+    const val AVERAGE_BADGE = "Ø 2 stanice"
+
     fun weight(ageMin: Float): Float = 1f / (ageMin + WEIGHT_OFFSET_MIN)
 
     fun synthesize(measurements: Map<String, StationMeasurement>, nowMs: Long): WidgetState {
@@ -79,7 +82,7 @@ object WidgetSynthesis {
                     .sum() / weights.sum()
                 WidgetState(
                     temperatureC = weighted,
-                    badge = "Ø 2 stanice",
+                    badge = AVERAGE_BADGE,
                     measuredAtMs = usable.minOf { it.measuredAtMs },
                     status = WidgetStatus.OK,
                     // Non-temperature values come from the PRIMARY station (F2.5).

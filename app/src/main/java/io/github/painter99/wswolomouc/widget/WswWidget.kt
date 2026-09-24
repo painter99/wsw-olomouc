@@ -172,10 +172,13 @@ fun WidgetContent(layout: WidgetLayoutState, nowMs: Long) {
                         style = textStyle(14)
                     )
                 }
-                Text(
-                    text = layout.left.measuredAtMs?.let { "Měření " + clockTime(it) } ?: "Bez dat",
-                    style = textStyle(14)
-                )
+                if (layout.showLeftAge) {
+                    Text(
+                        text = layout.left.measuredAtMs?.let { "Měření " + clockTime(it) }
+                            ?: "Bez dat",
+                        style = textStyle(14)
+                    )
+                }
             }
             Spacer(modifier = GlanceModifier.width(10.dp))
             // RIGHT half: BOTH stations, each with its own last-update time.

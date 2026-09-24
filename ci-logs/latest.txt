@@ -1,4 +1,4 @@
-# CI run 92 — commit c44b819 — m17b-utc-fallback
+# CI run 93 — commit d1f5838 — m17b-utc-fallback
 
 ===== build_output.txt =====
 Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
@@ -29,69 +29,92 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
-> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebugUnitTest
+> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebug
 > Task :app:processDebugResources
-> Task :app:kspDebugKotlin
-> Task :app:compileDebugKotlin
-> Task :app:compileDebugJavaWithJavac
-> Task :app:hiltAggregateDepsDebug
-> Task :app:hiltJavaCompileDebug
-> Task :app:processDebugJavaRes
-> Task :app:bundleDebugClassesToCompileJar
-> Task :app:transformDebugClassesWithAsm
-> Task :app:bundleDebugClassesToRuntimeJar
-> Task :app:kspDebugUnitTestKotlin
 
-> Task :app:compileDebugUnitTestKotlin
-w: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainDispatcherRule.kt:17:21 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
-w: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/painter99/wswolomouc/ui/MainDispatcherRule.kt:21:21 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+> Task :app:kspDebugKotlin FAILED
+e: [ksp] ModuleProcessingStep was unable to process 'io.github.painter99.wswolomouc.di.AppModule' because 'error.NonExistentClass' could not be resolved.
 
-> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
-> Task :app:hiltAggregateDepsDebugUnitTest
-> Task :app:hiltJavaCompileDebugUnitTest NO-SOURCE
-> Task :app:processDebugUnitTestJavaRes
-> Task :app:transformDebugUnitTestClassesWithAsm
+Dependency trace:
+    => element (OBJECT): io.github.painter99.wswolomouc.di.AppModule
+    => element (METHOD): rateLimitStore(android.content.Context)
+    => type (ERROR return type): error.NonExistentClass
 
-> Task :app:testDebugUnitTest
+If type 'error.NonExistentClass' is a generated type, check above for compilation errors that may have prevented the type from being generated. Otherwise, ensure that type 'error.NonExistentClass' is on your classpath.
+e: [ksp] BindingMethodProcessingStep was unable to process 'okHttpClient()' because 'error.NonExistentClass' could not be resolved.
 
-ChmuDataSourceTest > fetchResult_http404Today_fallsBackToYesterdaysFile FAILED
-    java.lang.AssertionError at ChmuDataSourceTest.kt:129
+Dependency trace:
+    => element (OBJECT): io.github.painter99.wswolomouc.di.AppModule
+    => element (METHOD): rateLimitStore(android.content.Context)
+    => type (ERROR return type): error.NonExistentClass
 
-ChmuDataSourceTest > fetch_requestsUtcDailyFile_notLocalZone FAILED
-    org.junit.ComparisonFailure at ChmuDataSourceTest.kt:146
+If type 'error.NonExistentClass' is a generated type, check above for compilation errors that may have prevented the type from being generated. Otherwise, ensure that type 'error.NonExistentClass' is on your classpath.
+e: [ksp] BindingMethodProcessingStep was unable to process 'systemClock()' because 'error.NonExistentClass' could not be resolved.
 
-ChmuJsonParserTest > daily rain sums only rows of the newest local day FAILED
-    java.lang.AssertionError at ChmuJsonParserTest.kt:141
+Dependency trace:
+    => element (OBJECT): io.github.painter99.wswolomouc.di.AppModule
+    => element (METHOD): rateLimitStore(android.content.Context)
+    => type (ERROR return type): error.NonExistentClass
 
-ChmuJsonParserTest > daily rain is zero when no rain fell on the newest local day FAILED
-    java.lang.AssertionError at ChmuJsonParserTest.kt:154
+If type 'error.NonExistentClass' is a generated type, check above for compilation errors that may have prevented the type from being generated. Otherwise, ensure that type 'error.NonExistentClass' is on your classpath.
+e: [ksp] BindingMethodProcessingStep was unable to process 'appDatabase(android.content.Context)' because 'error.NonExistentClass' could not be resolved.
 
-WeatherRepositoryTest > refresh_allFail_staleCache_servesStale FAILED
-    java.lang.AssertionError at WeatherRepositoryTest.kt:313
+Dependency trace:
+    => element (OBJECT): io.github.painter99.wswolomouc.di.AppModule
+    => element (METHOD): rateLimitStore(android.content.Context)
+    => type (ERROR return type): error.NonExistentClass
 
-WeatherRepositoryTest > refresh_allSkipped_freshCache_freshnessIsFreshNotOffline FAILED
-    java.lang.AssertionError at WeatherRepositoryTest.kt:294
+If type 'error.NonExistentClass' is a generated type, check above for compilation errors that may have prevented the type from being generated. Otherwise, ensure that type 'error.NonExistentClass' is on your classpath.
+e: [ksp] BindingMethodProcessingStep was unable to process 'measurementDao(io.github.painter99.wswolomouc.db.AppDatabase)' because 'error.NonExistentClass' could not be resolved.
 
-MainViewModelTest > refresh_rateLimited_messageSaysUpdateWasSkipped FAILED
-    java.lang.AssertionError at MainViewModelTest.kt:241
+Dependency trace:
+    => element (OBJECT): io.github.painter99.wswolomouc.di.AppModule
+    => element (METHOD): rateLimitStore(android.content.Context)
+    => type (ERROR return type): error.NonExistentClass
 
-147 tests completed, 7 failed
+If type 'error.NonExistentClass' is a generated type, check above for compilation errors that may have prevented the type from being generated. Otherwise, ensure that type 'error.NonExistentClass' is on your classpath.
+e: [ksp] BindingMethodProcessingStep was unable to process 'rateLimitStore(android.content.Context)' because 'error.NonExistentClass' could not be resolved.
 
-> Task :app:testDebugUnitTest FAILED
+Dependency trace:
+    => element (OBJECT): io.github.painter99.wswolomouc.di.AppModule
+    => element (METHOD): rateLimitStore(android.content.Context)
+    => type (ERROR return type): error.NonExistentClass
+
+If type 'error.NonExistentClass' is a generated type, check above for compilation errors that may have prevented the type from being generated. Otherwise, ensure that type 'error.NonExistentClass' is on your classpath.
+e: [ksp] BindingMethodProcessingStep was unable to process 'weatherRepository(okhttp3.OkHttpClient,io.github.painter99.wswolomouc.db.MeasurementDao,error.NonExistentClass)' because 'error.NonExistentClass' could not be resolved.
+
+Dependency trace:
+    => element (OBJECT): io.github.painter99.wswolomouc.di.AppModule
+    => element (METHOD): rateLimitStore(android.content.Context)
+    => type (ERROR return type): error.NonExistentClass
+
+If type 'error.NonExistentClass' is a generated type, check above for compilation errors that may have prevented the type from being generated. Otherwise, ensure that type 'error.NonExistentClass' is on your classpath.
+e: [ksp] BindingMethodProcessingStep was unable to process 'themeStore(android.content.Context)' because 'error.NonExistentClass' could not be resolved.
+
+Dependency trace:
+    => element (OBJECT): io.github.painter99.wswolomouc.di.AppModule
+    => element (METHOD): rateLimitStore(android.content.Context)
+    => type (ERROR return type): error.NonExistentClass
+
+If type 'error.NonExistentClass' is a generated type, check above for compilation errors that may have prevented the type from being generated. Otherwise, ensure that type 'error.NonExistentClass' is on your classpath.
+e: Error occurred in KSP, check log for detail
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':app:testDebugUnitTest'.
-> There were failing tests. See the report at: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/build/reports/tests/testDebugUnitTest/index.html
+Execution failed for task ':app:kspDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
 
 * Try:
+> Run with --info or --debug option to get more log output.
 > Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
 
 * Exception is:
-org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:testDebugUnitTest'.
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:kspDebugKotlin'.
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
 	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
@@ -123,20 +146,18 @@ org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:tes
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
-Caused by: org.gradle.api.internal.exceptions.MarkedVerificationException: There were failing tests. See the report at: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/build/reports/tests/testDebugUnitTest/index.html
-	at org.gradle.api.tasks.testing.AbstractTestTask.handleTestFailures(AbstractTestTask.java:705)
-	at org.gradle.api.tasks.testing.AbstractTestTask.handleCollectedResults(AbstractTestTask.java:539)
-	at org.gradle.api.tasks.testing.AbstractTestTask.executeTests(AbstractTestTask.java:534)
-	at org.gradle.api.tasks.testing.Test.executeTests(Test.java:715)
-	at com.android.build.gradle.tasks.factory.AndroidUnitTest.executeTests(AndroidUnitTest.java:171)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
-	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.doExecute(StandardTaskAction.java:58)
-	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
-	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
-	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:244)
+Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+	at org.gradle.workers.internal.DefaultWorkerExecutor$WorkItemExecution.waitForCompletion(DefaultWorkerExecutor.java:287)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.lambda$waitForItemsAndGatherFailures$2(DefaultAsyncWorkTracker.java:130)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLocks(DefaultWorkerLeaseService.java:339)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLocks(DefaultWorkerLeaseService.java:322)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLock(DefaultWorkerLeaseService.java:327)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForItemsAndGatherFailures(DefaultAsyncWorkTracker.java:126)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForItemsAndGatherFailures(DefaultAsyncWorkTracker.java:92)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForAll(DefaultAsyncWorkTracker.java:78)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForCompletion(DefaultAsyncWorkTracker.java:66)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:252)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
@@ -249,34 +270,39 @@ Caused by: org.gradle.api.internal.exceptions.MarkedVerificationException: There
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilation error. See log for more details
+	at org.jetbrains.kotlin.gradle.tasks.TasksUtilsKt.throwExceptionIfCompilationFailed(tasksUtils.kt:21)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.run(GradleKotlinCompilerWork.kt:119)
+	at org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction.execute(GradleCompilerRunnerWithWorkers.kt:76)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:174)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:195)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:128)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:170)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:267)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:131)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:136)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:165)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:134)
+	... 2 more
 
 
-BUILD FAILED in 2m 4s
-30 actionable tasks: 30 executed
+BUILD FAILED in 1m 32s
+16 actionable tasks: 16 executed
 
-===== junit summary =====
-<testsuite name="io.github.painter99.wswolomouc.SourcesTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:43" hostname="runnervmtr4k5" time="0.043">
-<testsuite name="io.github.painter99.wswolomouc.data.ChmuDataSourceTest" tests="10" skipped="0" failures="2" errors="0" timestamp="2026-09-24T02:03:43" hostname="runnervmtr4k5" time="0.509">
-    <failure message="java.lang.AssertionError: was HttpError(code=404)" type="java.lang.AssertionError">java.lang.AssertionError: was HttpError(code=404)
-    <failure message="org.junit.ComparisonFailure: file name must use the UTC date expected:&lt;2026092[4]&gt; but was:&lt;2026092[3]&gt;" type="org.junit.ComparisonFailure">org.junit.ComparisonFailure: file name must use the UTC date expected:&lt;2026092[4]&gt; but was:&lt;2026092[3]&gt;
-<testsuite name="io.github.painter99.wswolomouc.data.ChmuJsonParserTest" tests="14" skipped="0" failures="2" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.014">
-    <failure message="java.lang.AssertionError: expected:&lt;0.7&gt; but was:&lt;1.7&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;0.7&gt; but was:&lt;1.7&gt;
-    <failure message="java.lang.AssertionError: expected:&lt;0.0&gt; but was:&lt;1.0&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;0.0&gt; but was:&lt;1.0&gt;
-<testsuite name="io.github.painter99.wswolomouc.data.CustomClientrawParserTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.011">
-<testsuite name="io.github.painter99.wswolomouc.data.InfopocasiDataSourceTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.056">
-<testsuite name="io.github.painter99.wswolomouc.data.StationMeasurementMapperTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.001">
-<testsuite name="io.github.painter99.wswolomouc.data.WeatherRepositoryTest" tests="17" skipped="0" failures="2" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.057">
-    <failure message="java.lang.AssertionError: expected:&lt;STALE&gt; but was:&lt;OFFLINE&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;STALE&gt; but was:&lt;OFFLINE&gt;
-    <failure message="java.lang.AssertionError: expected:&lt;FRESH&gt; but was:&lt;OFFLINE&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected:&lt;FRESH&gt; but was:&lt;OFFLINE&gt;
-<testsuite name="io.github.painter99.wswolomouc.sync.SyncScheduleTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.001">
-<testsuite name="io.github.painter99.wswolomouc.ui.FeelsLikeTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.001">
-<testsuite name="io.github.painter99.wswolomouc.ui.FormatTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.038">
-<testsuite name="io.github.painter99.wswolomouc.ui.MainUiStateMapperTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.009">
-<testsuite name="io.github.painter99.wswolomouc.ui.MainViewModelTest" tests="12" skipped="0" failures="1" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.171">
-    <failure message="java.lang.AssertionError: was: Data před 0 min – další aktualizace za 10 min" type="java.lang.AssertionError">java.lang.AssertionError: was: Data před 0 min – další aktualizace za 10 min
-<testsuite name="io.github.painter99.wswolomouc.ui.RelativeTimeFormatterTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.007">
-<testsuite name="io.github.painter99.wswolomouc.ui.ThemeModeTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.0">
-<testsuite name="io.github.painter99.wswolomouc.ui.TrendTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.002">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetLayoutTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.007">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetPaletteTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.002">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetSynthesisTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-09-24T02:03:44" hostname="runnervmtr4k5" time="0.003">

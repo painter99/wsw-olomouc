@@ -206,9 +206,11 @@ fun MainContent(
                 text = "Aplikace kombinuje data ze dvou stanic. Hlavní " +
                     "zdroj dat v aplikaci je Infopocasi v Neředíně, měří " +
                     "zhruba každou minutu, takže zobrazené hodnoty bývají " +
-                    "čerstvé. Druhou stanici provozuje ČHMÚ v Holici. Ta " +
-                    "publikuje měření zhruba jednou za hodinu a hodí se " +
-                    "hlavně k porovnání a jako záloha. Konečnou teplotu, " +
+                    "čerstvé. Druhou stanici provozuje ČHMÚ v Holici. " +
+                    "Měří každých 10 minut a data se v otevřených datech " +
+                    "objevují přibližně po 10–15 minutách — v aplikaci " +
+                    "proto slouží hlavně k porovnání a jako záloha. " +
+                    "Konečnou teplotu, " +
                     "vítr, poryvy, srážky i pocitovou teplotu na widgetu " +
                     "počítá aplikace jako průměr obou stanic vážený " +
                     "čerstvostí — čerstvější měření má větší váhu " +

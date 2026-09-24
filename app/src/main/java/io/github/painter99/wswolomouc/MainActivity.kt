@@ -217,7 +217,8 @@ fun MainContent(
                     text = "Doplňkově aplikace využívá stanici ČHMÚ " +
                         "v Holici. Ta měří v desetiminutových intervalech, " +
                         "ale otevřená data, ze kterých aplikace čerpá, se " +
-                        "zveřejňují jen zhruba jednou za hodinu. Slouží " +
+                        "zveřejňují zhruba každou hodinu, v krajních " +
+                        "případech až po třech hodinách. Slouží " +
                         "proto především k porovnání a jako záložní zdroj.",
                     style = MaterialTheme.typography.bodySmall
                 )

@@ -1,4 +1,4 @@
-# CI run 96 — commit 0503988 — m17b-utc-fallback
+# CI run 97 — commit 4e9fc56 — m17b-utc-fallback
 
 ===== build_output.txt =====
 Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
@@ -29,16 +29,15 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebugUnitTest
 > Task :app:javaPreCompileDebug
-> Task :app:processDebugManifestForPackage
 > Task :app:processDebugResources
 > Task :app:kspDebugKotlin
 
 > Task :app:compileDebugKotlin FAILED
 e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/di/AppModule.kt:10:28 Unresolved reference 'wswolouc'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/di/AppModule.kt:56:9 Unresolved reference 'DataStoreRateLimitStore'.
-e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/di/AppModule.kt:74:17 Unresolved reference 'ChmuDataSource'.
+e: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/main/java/io/github/painter99/wswolomouc/di/AppModule.kt:75:17 Unresolved reference 'ChmuDataSource'.
 
 FAILURE: Build failed with an exception.
 
@@ -242,6 +241,6 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 1m 37s
+BUILD FAILED in 1m 54s
 17 actionable tasks: 17 executed
 

@@ -46,17 +46,23 @@ class WeatherRepository(
     private val sources: List<StationDataSource>,
     private val dao: MeasurementDao,
     private val clock: () -> Long = System::currentTimeMillis,
-    private val rateLimitMs: Long = Sources.FETCH_RATE_LIMIT_MS
+    private val rateLimitMs: Long = Sources.FETCH_RATE_LIMIT_MS,
+    /**
+     * Persistent rate-limit state (M1.7b, Pavel 24. 9. 2026) — production
+     * wiring uses DataStore so the 10-min budget survives process death
+     * (widget refresh must not bypass the limit after the app is closed).
+     */
+    private val rateLimitStore: RateLimitStore = NoopRateLimitStore
 ) {
 
     enum class Freshness {
-        /** All stations served fresh data (network fetch succeeded). */
+        /** All shown values are within the staleness threshold — network or fresh cache. */
         FRESH,
 
-        /** Network fetch succeeded but data is older than the staleness threshold. */
+        /** Data shown, but older than the staleness threshold. */
         STALE,
 
-        /** No source answered — cached values (possibly none) are served (G6). */
+        /** Nothing to show at all — no network data and no cache (G6). */
         OFFLINE
     }
 
@@ -79,12 +85,25 @@ class WeatherRepository(
     )
 
     private val lastAttemptAt = mutableMapOf<String, Long>()
+    private var rateLimitLoaded = false
+
+    /** Load persisted attempts once per process (M1.7b). */
+    private suspend fun ensureRateLimitLoaded() {
+        if (rateLimitLoaded) return
+        rateLimitLoaded = true
+        try {
+            lastAttemptAt.putAll(rateLimitStore.loadAll())
+        } catch (e: Exception) {
+            // F1.4 defense in depth: limiter degrades to in-memory state
+        }
+    }
 
     /** Last fetch outcome per source (M1.6b-3); rate-limited skips keep it. */
     private val lastOutcome = mutableMapOf<String, FetchResult>()
 
     suspend fun refresh(): Snapshot = withContext(Dispatchers.IO) {
         val now = clock()
+        ensureRateLimitLoaded()
         val fetched = mutableMapOf<String, StationMeasurement>()
         var attemptedAny = false
 
@@ -92,6 +111,11 @@ class WeatherRepository(
             val last = lastAttemptAt[source.id]
             if (last != null && now - last < rateLimitMs) continue // F1.5
             lastAttemptAt[source.id] = now
+            try {
+                rateLimitStore.put(source.id, now)
+            } catch (e: Exception) {
+                // F1.4 defense in depth: persistence failure must not break refresh
+            }
             attemptedAny = true
             val outcome = try {
                 source.fetchResult()
@@ -107,9 +131,11 @@ class WeatherRepository(
 
         val merged = latestFromCache() + fetched
 
+        // M1.7b (Pavel 24. 9. 2026): freshness describes the DATA being shown,
+        // not whether the network answered this cycle. A skipped refresh with
+        // a 2-min-old cache must be FRESH, not "Offline".
         val freshness = when {
             merged.isEmpty() -> Freshness.OFFLINE
-            fetched.isEmpty() -> Freshness.OFFLINE // nothing answered, cache only
             merged.values.all { isFresh(it, now) } -> Freshness.FRESH
             else -> Freshness.STALE
         }

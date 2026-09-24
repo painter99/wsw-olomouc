@@ -103,9 +103,9 @@ class WeatherRepositoryTest {
     }
 
     @Test
-    fun refresh_bothFail_servesCacheAsOffline() = runTest {
+    fun refresh_bothFail_freshCache_servedAsFresh() = runTest {
         val dao = FakeDao()
-        // Pre-existing cache from an earlier (old) fetch.
+        // Pre-existing cache from an earlier (old) fetch — still fresh.
         dao.insert(measurement(Sources.STATION_INFOPOCASI, now - 3 * 60_000).toEntity())
         val primary = FakeSource(Sources.STATION_INFOPOCASI, null)
         val fallback = FakeSource(Sources.STATION_CHMU, null)
@@ -113,7 +113,9 @@ class WeatherRepositoryTest {
 
         val snap = repo.refresh()
 
-        assertEquals(WeatherRepository.Freshness.OFFLINE, snap.freshness)
+        // M1.7b (Pavel 24. 9.): freshness describes the DATA, not the cycle —
+        // a 3-min-old cache is FRESH even when nothing answered.
+        assertEquals(WeatherRepository.Freshness.FRESH, snap.freshness)
         assertEquals(1, snap.measurements.size) // cached value still served (G6)
     }
 
@@ -286,5 +288,105 @@ class WeatherRepositoryTest {
         assertEquals(12f, repo.pastTemperature(Sources.STATION_INFOPOCASI, now - 3 * hour)!!, 0.001f)
         assertEquals(14f, repo.pastTemperature(Sources.STATION_INFOPOCASI, now - 1 * hour)!!, 0.001f)
         assertNull(repo.pastTemperature(Sources.STATION_INFOPOCASI, now - 5 * hour))
+    }
+
+    // --- M1.7b: honest freshness (Pavel 24. 9. 2026) -------------------------
+
+    @Test
+    fun refresh_allSkipped_freshCache_freshnessIsFreshNotOffline() = runTest {
+        // Manual refresh while every source is rate limited must NOT report
+        // "Offline" when the served cache is fresh ("Offline · mereni pred
+        // 2 min" made no sense — Pavel 24. 9.).
+        val dao = FakeDao()
+        val primary = FakeSource(
+            Sources.STATION_INFOPOCASI, measurement(Sources.STATION_INFOPOCASI, now)
+        )
+        val repo = WeatherRepository(
+            listOf(primary, FakeSource(Sources.STATION_CHMU, null)), dao, clock = { now }
+        )
+        repo.refresh()
+        val second = repo.refresh() // fixed clock -> every source skipped
+
+        assertTrue(second.skippedByRateLimit)
+        assertEquals(WeatherRepository.Freshness.FRESH, second.freshness)
+    }
+
+    @Test
+    fun refresh_allFail_staleCache_servesStale() = runTest {
+        val dao = FakeDao()
+        dao.insert(measurement(Sources.STATION_INFOPOCASI, now - 2 * 60 * 60_000).toEntity())
+        val repo = WeatherRepository(
+            listOf(FakeSource(Sources.STATION_INFOPOCASI, null), FakeSource(Sources.STATION_CHMU, null)),
+            dao, clock = { now }
+        )
+
+        val snap = repo.refresh()
+
+        assertEquals(WeatherRepository.Freshness.STALE, snap.freshness)
+        assertEquals(1, snap.measurements.size)
+    }
+
+    // --- M1.7b: persistent rate limit (Pavel 24. 9. 2026) --------------------
+
+    private class FakeRateLimitStore : RateLimitStore {
+        val map = mutableMapOf<String, Long>()
+        override suspend fun loadAll(): Map<String, Long> = map.toMap()
+        override suspend fun put(sourceId: String, lastAttemptAtMs: Long) {
+            map[sourceId] = lastAttemptAtMs
+        }
+    }
+
+    @Test
+    fun rateLimit_persistsAcrossRepositoryInstances() = runTest {
+        // Fresh process (e.g. widget refresh after the app was closed) must
+        // see the persisted attempts — the widget must not bypass the limit.
+        val store = FakeRateLimitStore()
+        val primary1 = FakeSource(
+            Sources.STATION_INFOPOCASI, measurement(Sources.STATION_INFOPOCASI, now)
+        )
+        val repo1 = WeatherRepository(
+            listOf(primary1, FakeSource(Sources.STATION_CHMU, null)), FakeDao(),
+            clock = { now }, rateLimitStore = store
+        )
+        repo1.refresh()
+        assertEquals(1, primary1.fetchCount)
+
+        // "New process": fresh repository, same persisted store.
+        val primary2 = FakeSource(
+            Sources.STATION_INFOPOCASI, measurement(Sources.STATION_INFOPOCASI, now + 60_000)
+        )
+        val repo2 = WeatherRepository(
+            listOf(primary2, FakeSource(Sources.STATION_CHMU, null)), FakeDao(),
+            clock = { now + 60_000 }, rateLimitStore = store
+        )
+        val snap = repo2.refresh()
+
+        assertEquals("persisted limit must skip the fetch", 0, primary2.fetchCount)
+        assertTrue(snap.skippedByRateLimit)
+    }
+
+    @Test
+    fun rateLimit_expiredPersistedAttempt_allowsFetch() = runTest {
+        val store = FakeRateLimitStore()
+        val primary1 = FakeSource(
+            Sources.STATION_INFOPOCASI, measurement(Sources.STATION_INFOPOCASI, now)
+        )
+        val repo1 = WeatherRepository(
+            listOf(primary1, FakeSource(Sources.STATION_CHMU, null)), FakeDao(),
+            clock = { now }, rateLimitStore = store
+        )
+        repo1.refresh()
+
+        val primary2 = FakeSource(
+            Sources.STATION_INFOPOCASI,
+            measurement(Sources.STATION_INFOPOCASI, now + Sources.FETCH_RATE_LIMIT_MS)
+        )
+        val repo2 = WeatherRepository(
+            listOf(primary2, FakeSource(Sources.STATION_CHMU, null)), FakeDao(),
+            clock = { now + Sources.FETCH_RATE_LIMIT_MS }, rateLimitStore = store
+        )
+        repo2.refresh()
+
+        assertEquals("expired persisted attempt must allow the fetch", 1, primary2.fetchCount)
     }
 }

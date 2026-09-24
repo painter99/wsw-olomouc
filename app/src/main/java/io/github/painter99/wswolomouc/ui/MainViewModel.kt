@@ -120,7 +120,10 @@ class MainViewModel @Inject constructor(
                         val dataAgeMin = snapshot.measurements.values
                             .maxOfOrNull { m -> (nowMs - m.measuredAtMs) / 60_000 }
                             ?.toInt() ?: 0
-                        "Data před $dataAgeMin min – další aktualizace za $minutes min"
+                        // M1.7b fix (Pavel 24. 9.): the tap was SKIPPED — the
+                        // text must not read like a completed update.
+                        "Aktualizace přeskočena – data před $dataAgeMin min, " +
+                            "ruční aktualizace za $minutes min"
                     }
             } else {
                 null

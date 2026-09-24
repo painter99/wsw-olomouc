@@ -8,7 +8,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.painter99.wswolomouc.data.ChmuDataSource
+import io.github.painter99.wswolomouc.data.DataStoreRateLimitStore
 import io.github.painter99.wswolomouc.data.InfopocasiDataSource
+import io.github.painter99.wswolomouc.data.RateLimitStore
 import io.github.painter99.wswolomouc.data.WeatherRepository
 import io.github.painter99.wswolomouc.db.AppDatabase
 import io.github.painter99.wswolomouc.db.MeasurementDao
@@ -48,6 +50,12 @@ object AppModule {
     @Provides
     fun measurementDao(db: AppDatabase): MeasurementDao = db.measurementDao()
 
+    /** Persistent rate-limit state (M1.7b, Pavel 24. 9. 2026). */
+    @Provides
+    @Singleton
+    fun rateLimitStore(@ApplicationContext context: Context): RateLimitStore =
+        DataStoreRateLimitStore(context)
+
     /**
      * Primary source first (F1.4). Primary = INFOPOCASI, hardcoded per the
      * M1.4 decision (Q5 recommendation; user choice arrives with F5.1).
@@ -56,13 +64,18 @@ object AppModule {
      */
     @Provides
     @Singleton
-    fun weatherRepository(client: OkHttpClient, dao: MeasurementDao): WeatherRepository =
+    fun weatherRepository(
+        client: OkHttpClient,
+        dao: MeasurementDao,
+        rateLimitStore: RateLimitStore
+    ): WeatherRepository =
         WeatherRepository(
             sources = listOf(
                 InfopocasiDataSource(client),
                 ChmuDataSource(client)
             ),
-            dao = dao
+            dao = dao,
+            rateLimitStore = rateLimitStore
         )
 
     /** Persisted theme preference (round 2, Pavel 23. 9. 2026). */

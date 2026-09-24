@@ -3,6 +3,7 @@ package io.github.painter99.wswolomouc.data
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
+import java.time.ZoneId
 
 /**
  * Parser for CHMU OpenData 10M daily JSON (PRD F1.2).
@@ -41,8 +42,7 @@ object ChmuJsonParser {
         // Latest value per element + the newest DT seen for the station.
         val latestByElement = HashMap<String, Pair<Instant, Float>>()
         var newestDt: Instant? = null
-        var rainDaily = 0f
-        var rainDailySeen = false
+        val rainRows = ArrayList<Pair<Instant, Float>>()
 
         for (i in 0 until values.length()) {
             val row = values.optJSONArray(i) ?: continue
@@ -57,10 +57,10 @@ object ChmuJsonParser {
                 val value = row.optDouble(3, Double.NaN)
                 if (!value.isNaN()) {
                     if (element == EL_RAIN) {
-                        // The daily file holds every 10-minute SRA10M row of
-                        // the day — the daily total is their exact sum.
-                        rainDaily += value.toFloat()
-                        rainDailySeen = true
+                        // The daily file holds every 10-minute SRA10M row
+                        // of the UTC day — the local-day total is filtered
+                        // below (M1.7b, Pavel 24. 9.).
+                        rainRows += dt to value.toFloat()
                     }
                     val existing = latestByElement[element]
                     if (existing == null || dt.isAfter(existing.first)) {
@@ -72,6 +72,18 @@ object ChmuJsonParser {
 
         newestDt ?: return null
 
+        // "Uhrn za den" = sum of the SRA10M rows belonging to the LOCAL
+        // (Europe/Prague) calendar day of the newest row — od pulnoci, same
+        // definition as the Infopocasi station's own daily total (M1.7b,
+        // Pavel 24. 9. 2026). The UTC file spans 02:00-01:50 local, so a
+        // plain sum of the whole file would mix two local days.
+        val localDay = newestDt.atZone(PRAGUE).toLocalDate()
+        val rainDaily =
+            if (rainRows.isEmpty()) null
+            else rainRows
+                .filter { it.first.atZone(PRAGUE).toLocalDate() == localDay }
+                .sumOf { it.second.toDouble() }.toFloat()
+
         return ChmuMeasurement(
             stationCode = stationCode,
             measuredAtEpochMs = newestDt.toEpochMilli(),
@@ -81,11 +93,14 @@ object ChmuJsonParser {
             windGustMs = latestByElement[EL_WIND_GUST]?.second,
             windDirDeg = latestByElement[EL_WIND_DIR]?.second?.toInt(),
             rain10mMm = latestByElement[EL_RAIN]?.second,
-            rainDailyMm = if (rainDailySeen) rainDaily else null
+            rainDailyMm = rainDaily
         )
     }
 
     private val SUPPORTED = setOf(EL_TEMP, EL_HUMIDITY, EL_WIND, EL_WIND_GUST, EL_WIND_DIR, EL_RAIN)
+
+    /** Local day zone for the daily rain total (same day the station resets). */
+    private val PRAGUE = ZoneId.of("Europe/Prague")
 
     private fun parseDt(raw: String): Instant? = try {
         Instant.parse(raw)

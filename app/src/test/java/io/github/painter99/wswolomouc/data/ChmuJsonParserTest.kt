@@ -121,6 +121,38 @@ class ChmuJsonParserTest {
         assertEquals(11.0f, m.temperatureC)
         assertEquals(Instant.parse("2026-09-19T18:00:00Z").toEpochMilli(), m.measuredAtEpochMs)
     }
+
+    // --- M1.7b: daily rain = local day of the newest row (Pavel 24. 9.) -----
+
+    @Test
+    fun `daily rain sums only rows of the newest local day`() {
+        // 21:50Z = 23:50 local PREVIOUS day; 22:10Z/22:20Z = 00:10/00:20 local
+        // next day (Europe/Prague). "Uhrn za den" must cover the local day of
+        // the newest row (od pulnoci), not the whole UTC file.
+        val json = """
+            {"data":{"data":{"values":[
+              ["0-203-0-11742","T","2026-09-23T22:10:00Z",7.0,"",5.0],
+              ["0-203-0-11742","SRA10M","2026-09-23T21:50:00Z",1.0,"",5.0],
+              ["0-203-0-11742","SRA10M","2026-09-23T22:10:00Z",0.5,"",5.0],
+              ["0-203-0-11742","SRA10M","2026-09-23T22:20:00Z",0.2,"",5.0]
+            ]}}}
+        """.trimIndent()
+        val m = ChmuJsonParser.parse(json, station)!!
+        assertEquals(0.7f, m.rainDailyMm!!, 0.001f)
+        assertEquals(0.2f, m.rain10mMm)
+    }
+
+    @Test
+    fun `daily rain is zero when no rain fell on the newest local day`() {
+        val json = """
+            {"data":{"data":{"values":[
+              ["0-203-0-11742","T","2026-09-23T22:10:00Z",7.0,"",5.0],
+              ["0-203-0-11742","SRA10M","2026-09-23T21:50:00Z",1.0,"",5.0]
+            ]}}}
+        """.trimIndent()
+        val m = ChmuJsonParser.parse(json, station)!!
+        assertEquals(0.0f, m.rainDailyMm!!, 0.001f)
+    }
 }
 
 

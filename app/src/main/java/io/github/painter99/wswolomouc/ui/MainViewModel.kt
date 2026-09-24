@@ -114,16 +114,11 @@ class MainViewModel @Inject constructor(
                     ?.takeIf { it > nowMs }
                     ?.let {
                         val minutes = ceil((it - nowMs) / 60_000.0).toInt()
-                        // Round 7 fix (Pavel 23. 9.): the message must be
-                        // HONEST — say how old the shown data is, not just
-                        // "wait 10 min" while the data is 4 minutes fresh.
-                        val dataAgeMin = snapshot.measurements.values
-                            .maxOfOrNull { m -> (nowMs - m.measuredAtMs) / 60_000 }
-                            ?.toInt() ?: 0
-                        // M1.7b fix (Pavel 24. 9.): the tap was SKIPPED — the
-                        // text must not read like a completed update.
-                        "Aktualizace přeskočena – data před $dataAgeMin min, " +
-                            "ruční aktualizace za $minutes min"
+                        // 24. 9. 2026: the tap was SKIPPED — the text must not
+                        // read like a completed update. The data age is NOT
+                        // part of this message anymore (the station cards
+                        // right above already show it); only the wait time.
+                        "Aktualizace přeskočena – ruční aktualizace za $minutes min"
                     }
             } else {
                 null

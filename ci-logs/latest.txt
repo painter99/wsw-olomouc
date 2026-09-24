@@ -1,4 +1,4 @@
-# CI run 93 — commit d1f5838 — m17b-utc-fallback
+# CI run 94 — commit 0483c40 — m17b-utc-fallback
 
 ===== build_output.txt =====
 Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
@@ -28,13 +28,15 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:parseDebugLocalResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
-> Task :app:preDebugUnitTestBuild UP-TO-DATE
-> Task :app:javaPreCompileDebugUnitTest
 > Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebug
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest
 > Task :app:processDebugResources
 
-> Task :app:kspDebugKotlin FAILED
+> Task :app:kspDebugKotlin
+e: The daemon has terminated unexpectedly on startup attempt #1 with error code: 0. The daemon process output:
+    1. Kotlin compile daemon is ready
 e: [ksp] ModuleProcessingStep was unable to process 'io.github.painter99.wswolomouc.di.AppModule' because 'error.NonExistentClass' could not be resolved.
 
 Dependency trace:
@@ -100,6 +102,8 @@ Dependency trace:
 
 If type 'error.NonExistentClass' is a generated type, check above for compilation errors that may have prevented the type from being generated. Otherwise, ensure that type 'error.NonExistentClass' is on your classpath.
 e: Error occurred in KSP, check log for detail
+
+> Task :app:kspDebugKotlin FAILED
 
 FAILURE: Build failed with an exception.
 
@@ -303,6 +307,6 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 1m 32s
+BUILD FAILED in 1m 39s
 16 actionable tasks: 16 executed
 

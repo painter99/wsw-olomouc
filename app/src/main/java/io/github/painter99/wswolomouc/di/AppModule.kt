@@ -8,7 +8,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.painter99.wswolouc.data.ChmuDataSource
-import io.github.painter99.wswolomouc.data.DataStoreRateLimitStore
 import io.github.painter99.wswolomouc.data.InfopocasiDataSource
 import io.github.painter99.wswolomouc.data.RateLimitStore
 import io.github.painter99.wswolomouc.data.WeatherRepository

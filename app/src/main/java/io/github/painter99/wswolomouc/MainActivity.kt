@@ -203,11 +203,19 @@ fun MainContent(
         }
         if (detailsExpanded) {
             Text(
-                text = "ČHMÚ Holice slouží k porovnání a jako záloha – ČHMÚ " +
-                    "publikuje měření zhruba jednou za hodinu, čerstvější je " +
-                    "Infopocasi. Průměr obou stanic (teplota, vítr, poryvy, " +
-                    "srážky i pocitová teplota) je vážený čerstvostí: čerstvější " +
-                    "měření má větší váhu (váha = 1/(stáří + 15 min)).",
+                text = "Aplikace kombinuje data ze dvou stanic. Hlavní " +
+                    "zdroj dat v aplikaci je Infopocasi v Neředíně, měří " +
+                    "zhruba každou minutu, takže zobrazené hodnoty bývají " +
+                    "čerstvé. Druhou stanici provozuje ČHMÚ v Holici. Ta " +
+                    "publikuje měření zhruba jednou za hodinu a hodí se " +
+                    "hlavně k porovnání a jako záloha. Konečnou teplotu, " +
+                    "vítr, poryvy, srážky i pocitovou teplotu na widgetu " +
+                    "počítá aplikace jako průměr obou stanic vážený " +
+                    "čerstvostí — čerstvější měření má větší váhu " +
+                    "(váha = 1/(stáří + 15 min)). V případě, kdy jsou data " +
+                    "ze stanice ČHMÚ starší než 30 minut, widget " +
+                    "nezobrazuje průměr obou stanic, ale pouze data " +
+                    "z Infopocasi.",
                 style = MaterialTheme.typography.bodySmall
             )
         }

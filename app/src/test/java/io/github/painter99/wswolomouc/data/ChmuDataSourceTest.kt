@@ -146,4 +146,21 @@ class ChmuDataSourceTest {
         assertEquals("second request must be the previous UTC day", first.minusDays(1), second)
     }
 
+    @Test
+    fun fetch_requestsUtcDailyFile() = runTest {
+        // CHMU names daily files by the UTC date (rows are UTC "Z"), never
+        // by a local zone — the old Europe/Prague name caused a guaranteed
+        // nightly 404 between local midnight and ~02:00 (M1.7b, Pavel 24. 9.).
+        server.enqueue(MockResponse().setBody(fixture()))
+        val ds = ChmuDataSource(
+            client = OkHttpClient(),
+            urlForDate = { dateCompact ->
+                requestedDates.add(dateCompact)
+                server.url("/10m-$dateCompact.json").toString()
+            },
+            todayUtc = { java.time.LocalDate.of(2026, 9, 24) }
+        )
+        ds.fetch()
+        assertEquals("20260924", requestedDates.single())
+    }
 }

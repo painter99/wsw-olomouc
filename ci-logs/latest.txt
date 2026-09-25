@@ -1,4 +1,4 @@
-# CI run 112 — commit 5807a44 — docs-readme-rewrite
+# CI run 113 — commit 8444f5d — main
 
 ===== build_output.txt =====
 Downloading https://services.gradle.org/distributions/gradle-8.9-bin.zip
@@ -17,8 +17,8 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
 > Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
-> Task :app:generateDebugResValues
 > Task :app:checkDebugAarMetadata
+> Task :app:generateDebugResValues
 > Task :app:mapDebugSourceSetPaths
 > Task :app:generateDebugResources
 > Task :app:packageDebugResources
@@ -55,7 +55,7 @@ w: file:///home/runner/work/wsw-olomouc/wsw-olomouc/app/src/test/java/io/github/
 > Task :app:transformDebugUnitTestClassesWithAsm
 > Task :app:testDebugUnitTest
 
-BUILD SUCCESSFUL in 2m 34s
+BUILD SUCCESSFUL in 2m 48s
 30 actionable tasks: 30 executed
 
 ===== apk_build_output.txt =====
@@ -110,26 +110,26 @@ Unable to strip the following libraries, packaging them as they are: libandroidx
 > Task :app:createDebugApkListingFileRedirect
 > Task :app:assembleDebug
 
-BUILD SUCCESSFUL in 55s
+BUILD SUCCESSFUL in 56s
 40 actionable tasks: 19 executed, 21 up-to-date
 
 ===== junit summary =====
-<testsuite name="io.github.painter99.wswolomouc.SourcesTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:18" hostname="runnervmtr4k5" time="0.06">
-<testsuite name="io.github.painter99.wswolomouc.data.ChmuDataSourceTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:18" hostname="runnervmtr4k5" time="0.707">
-<testsuite name="io.github.painter99.wswolomouc.data.ChmuJsonParserTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.034">
-<testsuite name="io.github.painter99.wswolomouc.data.CustomClientrawParserTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.026">
-<testsuite name="io.github.painter99.wswolomouc.data.InfopocasiDataSourceTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.065">
-<testsuite name="io.github.painter99.wswolomouc.data.RateLimitStoreKeysTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.002">
-<testsuite name="io.github.painter99.wswolomouc.data.StationMeasurementMapperTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.001">
-<testsuite name="io.github.painter99.wswolomouc.data.WeatherRepositoryTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.057">
-<testsuite name="io.github.painter99.wswolomouc.sync.SyncScheduleTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.001">
-<testsuite name="io.github.painter99.wswolomouc.ui.FeelsLikeTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.001">
-<testsuite name="io.github.painter99.wswolomouc.ui.FormatTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.035">
-<testsuite name="io.github.painter99.wswolomouc.ui.MainUiStateMapperTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.006">
-<testsuite name="io.github.painter99.wswolomouc.ui.MainViewModelTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.187">
-<testsuite name="io.github.painter99.wswolomouc.ui.RelativeTimeFormatterTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.005">
-<testsuite name="io.github.painter99.wswolomouc.ui.ThemeModeTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.0">
-<testsuite name="io.github.painter99.wswolomouc.ui.TrendTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.003">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetLayoutTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.011">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetPaletteTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.004">
-<testsuite name="io.github.painter99.wswolomouc.widget.WidgetSynthesisTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-09-24T18:25:19" hostname="runnervmtr4k5" time="0.001">
+<testsuite name="io.github.painter99.wswolomouc.SourcesTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.048">
+<testsuite name="io.github.painter99.wswolomouc.data.ChmuDataSourceTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.399">
+<testsuite name="io.github.painter99.wswolomouc.data.ChmuJsonParserTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.022">
+<testsuite name="io.github.painter99.wswolomouc.data.CustomClientrawParserTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.015">
+<testsuite name="io.github.painter99.wswolomouc.data.InfopocasiDataSourceTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.056">
+<testsuite name="io.github.painter99.wswolomouc.data.RateLimitStoreKeysTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.001">
+<testsuite name="io.github.painter99.wswolomouc.data.StationMeasurementMapperTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.001">
+<testsuite name="io.github.painter99.wswolomouc.data.WeatherRepositoryTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.052">
+<testsuite name="io.github.painter99.wswolomouc.sync.SyncScheduleTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.002">
+<testsuite name="io.github.painter99.wswolomouc.ui.FeelsLikeTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.001">
+<testsuite name="io.github.painter99.wswolomouc.ui.FormatTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.029">
+<testsuite name="io.github.painter99.wswolomouc.ui.MainUiStateMapperTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.006">
+<testsuite name="io.github.painter99.wswolomouc.ui.MainViewModelTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.164">
+<testsuite name="io.github.painter99.wswolomouc.ui.RelativeTimeFormatterTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:17" hostname="runnervmtr4k5" time="0.004">
+<testsuite name="io.github.painter99.wswolomouc.ui.ThemeModeTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:18" hostname="runnervmtr4k5" time="0.0">
+<testsuite name="io.github.painter99.wswolomouc.ui.TrendTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:18" hostname="runnervmtr4k5" time="0.002">
+<testsuite name="io.github.painter99.wswolomouc.widget.WidgetLayoutTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:18" hostname="runnervmtr4k5" time="0.009">
+<testsuite name="io.github.painter99.wswolomouc.widget.WidgetPaletteTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:18" hostname="runnervmtr4k5" time="0.003">
+<testsuite name="io.github.painter99.wswolomouc.widget.WidgetSynthesisTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-09-25T00:09:18" hostname="runnervmtr4k5" time="0.001">

@@ -304,6 +304,33 @@ class MainViewModelTest {
         assertEquals(TrendDirection.RISING, state.trends[0].direction)
     }
 
+    // --- startup: trends from a FRESH cache (Pavel 25. 9. 2026) ---------------
+
+    @Test
+    fun trends_populatedFromFreshCacheOnStartup_withoutRefresh() = runTest {
+        // Bug report (Pavel 25. 9.): the trend row appeared only after
+        // pressing "Aktualizovat". Root cause: doRefresh() computes trends,
+        // but the cache-first startup path (round 7: fresh cache -> NO
+        // network refresh) never does. This test keeps the cache fresh
+        // (newest row == now -> willRefresh == false) and still expects
+        // trends to be computed from Room history.
+        val hour = 3_600_000L
+        val dao = FakeDao()
+        dao.insert(measurement(Sources.STATION_INFOPOCASI, now).toEntity())
+        dao.insert(
+            measurement(Sources.STATION_INFOPOCASI, now - 2 * hour)
+                .copy(temperatureC = 10f).toEntity()
+        )
+        val vm = viewModel(dao = dao, primary = measurement(Sources.STATION_INFOPOCASI))
+        val state = awaitLoaded(vm)
+
+        // Fresh cache -> the startup refresh must NOT run (round 7 rule).
+        assertFalse(state.isRefreshing)
+        // 15 °C now vs 10 °C 2 h ago -> only the 1 h window has history.
+        assertEquals(listOf("1 h"), state.trends.map { it.label })
+        assertEquals(TrendDirection.RISING, state.trends[0].direction)
+    }
+
     // --- round 2: theme setting ------------------------------------------------
 
     @Test

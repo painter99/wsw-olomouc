@@ -12,7 +12,7 @@
 
 | Source | Type | Update cadence | License |
 |---|---|---|---|
-| [infopocasi-olomouc.cz](https://infopocasi-olomouc.cz) (Davis station, `customclientraw.txt`) | direct measurement | ~1 min | personal use, used with the operator's consent (2026-09-23) |
+| [infopocasi-olomouc.cz](https://infopocasi-olomouc.cz) (Davis station, `customclientraw.txt`) | direct measurement | ~1 min | used with the operator's consent (2026-09-23; public release approved 2026-09-25) |
 | [CHMI Olomouc–Holice](https://opendata.chmi.cz) (open data, station `0-203-0-11742`, measuring since 1850) | direct measurement, 10-min data | file published ~once per hour, occasionally up to ~3 h | CC BY 4.0 |
 
 How the app uses them:
@@ -26,12 +26,12 @@ How the app uses them:
 ## Features
 
 - **App**: both stations side by side with per-source status, feels-like temperature (wind chill / heat index), wind, daily precipitation, transparent data age, manual refresh with honest rate-limit message, dark/light/system theme.
-- **Widget 4×2 / 5×2**: synthesized value with source badge, both stations each with its own last-measurement time, 3-hour trend arrow, manual refresh, pure AMOLED black with high-contrast white text.
+- **Widget 4×2 / 5×2**: synthesized value with source badge, both stations each with its own last-measurement time, 90-minute trend arrow, manual refresh, pure AMOLED black with high-contrast white text.
 - **Background sync**: WorkManager every 15 minutes (the minimum WorkManager interval); Android may defer it in Doze overnight — the widget always shows the true data age instead of lying.
 
 ## Status
 
-Personal-use project, Phase 1 (M1.x milestones). **Done:** M1.1–M1.8d — including widget v2, UTC filename handling with previous-day fallback for CHMI, persistent rate limiting, UI texts (M1.8a) and the rate-limit persistence fix (M1.8d). **149 unit tests green in CI.** Next: station detail graph with 24 h history (M1.8b) and a landscape station comparison chart (M1.8c). Not on Google Play.
+Open-source project, publicly released as [v0.1.0](https://github.com/painter99/wsw-olomouc/releases/tag/v0.1.0). Phase 1 (M1.x milestones). **Done:** M1.1–M1.8d — including widget v2, UTC filename handling with previous-day fallback for CHMI, persistent rate limiting, UI texts (M1.8a), the rate-limit persistence fix (M1.8d) and 72 h history retention (M1.7c). **153 unit tests green in CI.** Next: station detail graph with 24 h history (M1.8b) and a landscape station comparison chart (M1.8c). Not on Google Play.
 
 ## Tech stack
 
@@ -44,8 +44,8 @@ Kotlin, Jetpack Compose, Glance (widget), OkHttp, Room, DataStore, Hilt, WorkMan
 ./gradlew testDebugUnitTest   # unit tests
 ```
 
-CI: GitHub Actions builds the app and runs the full unit-test suite on every push; full build logs are mirrored to the public `ci-logs` branch and a debug APK artifact is attached to every run.
+CI: GitHub Actions builds the app and runs the full unit-test suite on every push; full build logs are mirrored to the public `ci-logs` branch and a debug APK artifact is attached to every run. Pushing a `v*` tag additionally publishes a GitHub Release with a debug APK.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Weather data: CHMI open data under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); infopocasi-olomouc.cz data used with the operator's consent, personal use only.
+MIT — see [LICENSE](LICENSE). Weather data: CHMI open data under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); infopocasi-olomouc.cz data used with the operator's consent.

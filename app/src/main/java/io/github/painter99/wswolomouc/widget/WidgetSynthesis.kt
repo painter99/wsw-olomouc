@@ -15,7 +15,7 @@ enum class WidgetStatus { OK, STALE, OFFLINE }
  * from. The average is a spatial estimate for Olomouc — NEVER described as a
  * "more accurate measurement" (F2.5 wording rule).
  *
- * [trend] is the arrow of the DISPLAYED value (3 h window), set by the
+ * [trend] is the arrow of the DISPLAYED value (90 min window, Pavel 25. 9.), set by the
  * caller from Room history — the synthesis itself stays a pure
  * map -> state function.
  */

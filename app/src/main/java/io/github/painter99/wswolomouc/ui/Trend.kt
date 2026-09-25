@@ -12,8 +12,8 @@ enum class TrendDirection { RISING, FALLING, STEADY }
 object Trend {
     const val THRESHOLD_C = 0.3f
 
-    /** Widget window: one arrow, 3 h (Pavel 23. 9.). */
-    const val WIDGET_WINDOW_MS = 3L * 60 * 60 * 1000
+    /** Widget window: one arrow, 90 min (Pavel 25. 9. 2026 — the widget is read as a CURRENT value; originally 3 h, Pavel 23. 9.). */
+    const val WIDGET_WINDOW_MS = 90L * 60 * 1000
 
     /** App windows: all three at once (Pavel 23. 9.). */
     val APP_WINDOWS_MS: List<Pair<Long, String>> = listOf(

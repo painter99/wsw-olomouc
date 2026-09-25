@@ -75,7 +75,7 @@ class WswWidget : GlanceAppWidget() {
         val snapshot = repository.latestFromCache()
         val nowMs = System.currentTimeMillis()
 
-        // ONE trend arrow (3 h window) for the station behind the badge
+        // ONE trend arrow (90 min window, Pavel 25. 9.) for the station behind the badge
         // (Pavel 23. 9.). Computed here because it needs Room history; the
         // layout itself stays a pure function.
         val synth = WidgetSynthesis.synthesize(snapshot, nowMs)

@@ -225,7 +225,7 @@ class WidgetLayoutTest {
     }
 
     /**
-     * M1.7-trend (Pavel 23. 9.): ONE trend arrow (3 h window) next to the big
+     * M1.7-trend (Pavel 23. 9.): ONE trend arrow (90 min window since 25. 9.) next to the big
      * temperature — carried into the left widget state by the caller (the
      * widget computes it from Room history, the layout stays pure).
      */

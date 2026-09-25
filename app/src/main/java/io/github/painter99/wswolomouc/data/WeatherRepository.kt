@@ -131,6 +131,16 @@ class WeatherRepository(
 
         val merged = latestFromCache() + fetched
 
+        // M1.7c (Pavel 25. 9. 2026): Room retention — keep only the last 72 h
+        // of fetched rows (~290 rows/day would otherwise grow forever).
+        // Runs on every refresh path (startup, manual, both periodic syncs).
+        // Retention failure must not break the refresh (same defense as F1.4).
+        try {
+            dao.deleteFetchedBefore(now - Sources.RETENTION_MS)
+        } catch (e: Exception) {
+            // ignore — pruning is best-effort
+        }
+
         // M1.7b (Pavel 24. 9. 2026): freshness describes the DATA being shown,
         // not whether the network answered this cycle. A skipped refresh with
         // a 2-min-old cache must be FRESH, not "Offline".

@@ -38,7 +38,7 @@ object Sources {
     // The app must link the OFFICIAL pages of both sources, licenses visible
     // "podle standardů".
 
-    /** Infopocasi station page (the operator — consent 23. 9. 2026). */
+    /** Infopocasi station page (operator consent 23. 9. 2026; the operator's personal name is intentionally not shown — operator's request 25. 9. 2026). */
     const val INFOPOCASI_WEB = "https://infopocasi-olomouc.cz/meridla"
 
     /** Official CHMU station page for Olomouc-Holice (O2OLOM01). */

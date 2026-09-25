@@ -176,7 +176,12 @@ fun MainContent(
         if (state.trends.isNotEmpty()) {
             Text(
                 text = "Trend: " + state.trends.joinToString(" · ") { it.text },
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                // M1.7c (Pavel 25. 9.): align with the card CONTENT (screen
+                // padding 16 dp + card inner padding 16 dp) — a bare row in
+                // the outer column started at 16 dp and floated left of the
+                // station cards' text grid.
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
         state.secondary?.let { StationCard(it, nowMs, isPrimary = false) }

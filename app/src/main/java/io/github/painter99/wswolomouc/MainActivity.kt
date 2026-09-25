@@ -380,8 +380,10 @@ fun StationCard(s: StationUi, nowMs: Long, isPrimary: Boolean) {
 /**
  * M1.7-trend (Pavel 23. 9.): visible, clickable links to the OFFICIAL pages
  * of both data sources, licenses visible "podle standardů" (F5.4 extended).
- * Station identity per Pavel: the station operator = infopocasi-olomouc.cz (do NOT
- * conflate with the in-pocasi.cz aggregator).
+ * Station identity per Pavel: infopocasi-olomouc.cz (do NOT
+ * conflate with the in-pocasi.cz aggregator). The operator's personal name
+ * is intentionally NOT shown anywhere in the app or repo — at the
+ * operator's own request (25. 9. 2026).
  */
 @Composable
 fun SourceLinks() {

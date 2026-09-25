@@ -72,6 +72,36 @@ class WeatherRepositoryTest {
 
     // --- tests ---------------------------------------------------------------
 
+    // --- M1.7c: Room retention 72 h (Pavel 25. 9. 2026) -----------------------
+
+    @Test
+    fun refresh_prunesRowsFetchedOlderThan72h() = runTest {
+        // Bug report (Pavel 25. 9.): nothing ever called deleteFetchedBefore,
+        // so Room history grew forever (~290 rows/day). Retention: keep only
+        // the last 72 h of FETCHED rows (enough for the 24/48/72 h graphs).
+        val hour = 3_600_000L
+        val dao = FakeDao()
+        dao.insert(
+            measurement(Sources.STATION_INFOPOCASI, now - 73 * hour)
+                .copy(fetchedAtMs = now - 73 * hour).toEntity()
+        )
+        dao.insert(
+            measurement(Sources.STATION_INFOPOCASI, now - 71 * hour)
+                .copy(fetchedAtMs = now - 71 * hour).toEntity()
+        )
+        val primary = FakeSource(Sources.STATION_INFOPOCASI, measurement(Sources.STATION_INFOPOCASI, now))
+        val fallback = FakeSource(Sources.STATION_CHMU, measurement(Sources.STATION_CHMU, now))
+        val repo = WeatherRepository(listOf(primary, fallback), dao, clock = { now })
+
+        repo.refresh()
+
+        // 73 h old fetch pruned; 71 h row and both fresh rows stay.
+        assertEquals(
+            listOf(now - 71 * hour, now, now),
+            dao.rows.map { it.fetchedAt }.sorted()
+        )
+    }
+
     @Test
     fun refresh_primaryOk_fallbackNotCalled_resultSavedToDao() = runTest {
         val dao = FakeDao()

@@ -27,6 +27,9 @@ object Sources {
     /** Rate limiting: max 1 request per source per 10 min (F1.5). */
     const val FETCH_RATE_LIMIT_MS = 10L * 60 * 1000
 
+    /** Room retention: keep only the last 72 h of fetched rows (Pavel 25. 9. 2026; enough for the 24/48/72 h graphs). */
+    const val RETENTION_MS = 72L * 60 * 60 * 1000
+
     /** Daily CHMU data file URL for the given date (yyyyMMdd). */
     fun chmuDailyUrl(dateCompact: String): String =
         CHMU_BASE + "10m-" + CHMU_STATION_CODE + "-" + dateCompact + ".json"

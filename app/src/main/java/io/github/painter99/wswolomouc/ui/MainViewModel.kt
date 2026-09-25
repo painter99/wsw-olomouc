@@ -63,10 +63,14 @@ class MainViewModel @Inject constructor(
                 } else {
                     WeatherRepository.Freshness.STALE
                 }
-                MainUiStateMapper.from(
-                    WeatherRepository.Snapshot(freshness = freshness, measurements = cached),
-                    now0
-                )
+                val snapshot =
+                    WeatherRepository.Snapshot(freshness = freshness, measurements = cached)
+                // M1.7c (Pavel 25. 9.): trends must come from the cache too —
+                // with a fresh cache the startup refresh never runs (round 7),
+                // so without this the trend row appeared only after pressing
+                // "Aktualizovat".
+                MainUiStateMapper.from(snapshot, now0)
+                    .copy(trends = trendItems(snapshot, now0))
             } else {
                 // First launch, nothing cached: placeholders, no spinner.
                 MainUiState(
